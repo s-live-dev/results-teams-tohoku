@@ -232,91 +232,113 @@
             container.innerHTML = '<p class="text-gray-400 text-center p-4">競技開始をお待ちください</p>';
             return;
         }
-            container.innerHTML = data.map(team => `
-                <div class="bg-card backdrop-blur-sm rounded-lg shadow-lg border border-white-20"
-                    data-team-card="${team.name}">
-                    <button onclick="toggleAccordion(this)" class="w-full flex justify-between items-center px-6 py-2 lg-py-1 text-left font-bold" style="color: #F3F4F6 !important;">
-                    <div class="flex items-center justify-center">
-                        <span class="team-rank w-8 text-left text-lg lg-text-base">${team.rank}</span>
-                        <img src="${getTeamIconUrl(team.name)}" alt="${team.name} icon" class="team-icon-style">
-                        <span class="team-name flex-1 pr-4 text-center lg-text-base">${team.name}</span>
-                    </div>
-                    <div class="flex items-center justify-end team-total-container">
-                        <div class="team-total-breakdown">
-                            <span style="color: #c855e3 !important;">${team.trapTotal}</span>
-                            <span class="total-separator"> + </span>
-                            <span style="color: #eebf35 !important;">${team.skeetTotal}</span>
-                            <span class="total-separator">:</span>
-                        </div>
-                        <span class="team-total-overall" style="${getTotalScoreStyle(team.overallTotal, '#4ade80')}">
-                            ${team.overallTotal}
+        
+        container.innerHTML = data.map(team => `
+            <div class="bg-card backdrop-blur-sm rounded-lg shadow-lg border border-white-20"
+                data-team-card="${team.name}">
+                <button onclick="toggleAccordion(this)" class="w-full flex justify-between items-center px-6 py-2 lg-py-1 text-left font-bold" style="color: #F3F4F6 !important;">
+                <div class="flex items-center justify-center">
+                    <span class="team-rank w-8 text-left text-lg lg-text-base">${team.rank}</span>
+                    <img src="${getTeamIconUrl(team.name)}" alt="${team.name} icon" class="team-icon-style">
+                    <span class="team-name flex-1 pr-4 text-center lg-text-base">${team.name}</span>
+                </div>
+                <div class="flex items-center justify-end team-total-container">
+                    <div class="team-total-breakdown">
+                        <!-- トラップの順位と配点 -->
+                        <span style="color: #c855e3 !important;">
+                            ${team.trapRank ? team.trapPoints + '点' +'（' + team.trapRank + '位 ' + team.trapTotal + '）' : '-'}
                         </span>
-                        <i class="fa-solid fa-chevron-down accordion-chevron transition-transform duration-300"></i>
+                        <span class="total-separator"> + </span>
+                        <!-- スキートの順位と配点 -->
+                        <span style="color: #eebf35 !important;">
+                            ${team.skeetRank ? team.skeetPoints + '点' +'（' + team.skeetRank + '位 ' + team.skeetTotal + '）' : '-'}
+                        </span>
+                        <span class="total-separator"> = </span>
                     </div>
-                </button>
-                <div class="accordion-content">
-                    <div class="px-6">
-                        <div class="lg-grid lg-grid-cols-2 lg-gap-4">
-                            <div class="mb-4 lg-mb-1">
-                                <h4 class="font-bold mb-2 lg-mb-1 text-sm lg-font-black" style="color: #c855e3;">
-                                    <img src="https://s-live.org/wp-content/plugins/s-live/resource/TRAP.png" class="team-score-badge trap inline">
-                                    トラップ: <span style="${getTotalScoreStyle(team.trapTotal, '#c855e3')}">${team.trapTotal}点</span>
-                                </h4>
-                                <div class="overflow-x-auto">
-                                    <table class="w-full text-sm table-fixed">
-                                        <colgroup>
-                                            <col style="width: 12% !important;">  <col style="width: 43% !important;">  <col style="width: 8% !important;">   <col style="width: 8% !important;">   <col style="width: 8% !important;">   <col style="width: 8% !important;">   <col style="width: 13% !important;">
-                                        </colgroup>
-                                        <tbody class="divide-y">
-                                            ${team.trapPlayers.map(p => `
-                                                <tr data-team="${team.name}" data-player="${p.name}" style="color: #F3F4F6 !important;">
-                                                    <td class="py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="color: #F3F4F6 !important;">${p.rank}</td>
-                                                    <td class="py-0-5 lg-py-0 pl-0 player-name lg-text-xs lg-leading-tight" style="color: #F3F4F6 !important;">${p.name}<span class="player-pos"> (${p.pos})</span></td>
-                                                    <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r1)}">${p.r1}</td>
-                                                    <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r2)}">${p.r2}</td>
-                                                    <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r3)}">${p.r3}</td>
-                                                    <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r4)}">${p.r4}</td>
-                                                    <td class="text-right lg-text-center py-0-5 lg-py-0 pr-0 font-bold player-score lg-text-xs lg-leading-tight">
-                                                        <span class="score-value" style="${getTotalScoreStyle(p.total, '#c855e3')}">${p.total}</span>
-                                                    </td>
-                                                </tr>
-                                            `).join('')}
-                                        </tbody>
-                                    </table>
-                                </div>
+                    <!-- 総合配点 -->
+                    <span class="team-total-overall" style="${getTotalScoreStyle(team.overallTotal, '#4ade80')}">
+                        ${team.overallTotal}点
+                    </span>
+                    <i class="fa-solid fa-chevron-down accordion-chevron transition-transform duration-300"></i>
+                </div>
+            </button>
+            <div class="accordion-content">
+                <div class="px-6">
+                    <div class="lg-grid lg-grid-cols-2 lg-gap-4">
+                        <div class="mb-4 lg-mb-1">
+                            <h4 class="font-bold mb-2 lg-mb-1 text-sm lg-font-black" style="color: #c855e3;">
+                                <img src="https://s-live.org/wp-content/plugins/s-live/resource/TRAP.png" class="team-score-badge trap inline">
+                                トラップ: <span style="${getTotalScoreStyle(team.trapTotal, '#c855e3')}">${team.trapTotal}点</span>
+                                ${team.trapRank ? ' (' + team.trapRank + '位:' + team.trapPoints + '点)' : ''}
+                            </h4>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm table-fixed">
+                                    <colgroup>
+                                        <col style="width: 12% !important;">
+                                        <col style="width: 43% !important;">
+                                        <col style="width: 8% !important;">
+                                        <col style="width: 8% !important;">
+                                        <col style="width: 8% !important;">
+                                        <col style="width: 8% !important;">
+                                        <col style="width: 13% !important;">
+                                    </colgroup>
+                                    <tbody class="divide-y">
+                                        ${team.trapPlayers.map(p => `
+                                            <tr data-team="${team.name}" data-player="${p.name}" style="color: #F3F4F6 !important;">
+                                                <td class="py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="color: #F3F4F6 !important;">${p.rank}</td>
+                                                <td class="py-0-5 lg-py-0 pl-0 player-name lg-text-xs lg-leading-tight" style="color: #F3F4F6 !important;">${p.name}<span class="player-pos"> (${p.pos})</span></td>
+                                                <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r1)}">${p.r1}</td>
+                                                <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r2)}">${p.r2}</td>
+                                                <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r3)}">${p.r3}</td>
+                                                <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r4)}">${p.r4}</td>
+                                                <td class="text-right lg-text-center py-0-5 lg-py-0 pr-0 font-bold player-score lg-text-xs lg-leading-tight">
+                                                    <span class="score-value" style="${getTotalScoreStyle(p.total, '#c855e3')}">${p.total}</span>
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
                             </div>
-                            <div>
-                                <h4 class="font-bold mb-2 lg-mb-1 text-sm lg-font-black" style="color: #eebf35;">
-                                    <img src="https://s-live.org/wp-content/plugins/s-live/resource/SKEET.png" class="team-score-badge skeet inline">
-                                    スキート: <span style="${getTotalScoreStyle(team.skeetTotal, '#eebf35')}">${team.skeetTotal}点</span>
-                                </h4>
-                                <div class="overflow-x-auto">
-                                    <table class="w-full text-sm table-fixed">
-                                        <colgroup>
-                                            <col style="width: 12% !important;">  <col style="width: 43% !important;">  <col style="width: 8% !important;">   <col style="width: 8% !important;">   <col style="width: 8% !important;">   <col style="width: 8% !important;">   <col style="width: 13% !important;">
-                                        </colgroup>
-                                        <tbody class="divide-y">
-                                            ${team.skeetPlayers.map(p => `
-                                                <tr data-team="${team.name}" data-player="${p.name}" style="color: #F3F4F6 !important;">
-                                                    <td class="py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="color: #F3F4F6 !important;">${p.rank}</td>
-                                                    <td class="py-0-5 lg-py-0 pl-0 player-name lg-text-xs lg-leading-tight" style="color: #F3F4F6 !important;">${p.name}<span class="player-pos"> (${p.pos})</span></td>
-                                                    <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r1)}">${p.r1}</td>
-                                                    <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r2)}">${p.r2}</td>
-                                                    <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r3)}">${p.r3}</td>
-                                                    <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r4)}">${p.r4}</td>
-                                                    <td class="text-right lg-text-center py-0-5 lg-py-0 pr-0 font-bold player-score lg-text-xs lg-leading-tight">
-                                                        <span class="score-value" style="${getTotalScoreStyle(p.total, '#eebf35')}">${p.total}</span>
-                                                    </td>
-                                                </tr>
-                                            `).join('')}
-                                        </tbody>
-                                    </table>
-                                </div>
+                        </div>
+                        <div>
+                            <h4 class="font-bold mb-2 lg-mb-1 text-sm lg-font-black" style="color: #eebf35;">
+                                <img src="https://s-live.org/wp-content/plugins/s-live/resource/SKEET.png" class="team-score-badge skeet inline">
+                                スキート: <span style="${getTotalScoreStyle(team.skeetTotal, '#eebf35')}">${team.skeetTotal}点</span>
+                                ${team.skeetRank ? ' (' + team.skeetRank + '位:' + team.skeetPoints + '点)' : ''}
+                            </h4>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm table-fixed">
+                                    <colgroup>
+                                        <col style="width: 12% !important;">
+                                        <col style="width: 43% !important;">
+                                        <col style="width: 8% !important;">
+                                        <col style="width: 8% !important;">
+                                        <col style="width: 8% !important;">
+                                        <col style="width: 8% !important;">
+                                        <col style="width: 13% !important;">
+                                    </colgroup>
+                                    <tbody class="divide-y">
+                                        ${team.skeetPlayers.map(p => `
+                                            <tr data-team="${team.name}" data-player="${p.name}" style="color: #F3F4F6 !important;">
+                                                <td class="py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="color: #F3F4F6 !important;">${p.rank}</td>
+                                                <td class="py-0-5 lg-py-0 pl-0 player-name lg-text-xs lg-leading-tight" style="color: #F3F4F6 !important;">${p.name}<span class="player-pos"> (${p.pos})</span></td>
+                                                <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r1)}">${p.r1}</td>
+                                                <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r2)}">${p.r2}</td>
+                                                <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r3)}">${p.r3}</td>
+                                                <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r4)}">${p.r4}</td>
+                                                <td class="text-right lg-text-center py-0-5 lg-py-0 pr-0 font-bold player-score lg-text-xs lg-leading-tight">
+                                                    <span class="score-value" style="${getTotalScoreStyle(p.total, '#eebf35')}">${p.total}</span>
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
         `).join('');
     }
 

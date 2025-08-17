@@ -1260,3 +1260,54 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
         animation: blinkBrightness 1.5s infinite !important;
     }
 }
+
+<!-- /* === スマホ版で種目別配点を非表示 === */
+@media (max-width: 1023px) {
+    /* 総合成績の種目別配点詳細を非表示 */
+    #team-overall .team-total-breakdown {
+        display: none !important;
+    }
+    
+    /* 「=」記号も非表示 */
+    #team-overall .total-separator:last-of-type {
+        display: none !important;
+    }
+    
+    /* 総合配点のみ表示 */
+    #team-overall .team-total-overall {
+        font-size: 7vw !important;
+        margin-left: 0 !important;
+    }
+}
+
+/* === PC版では種目別配点を表示 === */
+@media (min-width: 1024px) {
+    /* PC版は既存のスタイルを維持 */
+    #team-overall .team-total-breakdown {
+        display: inline-flex !important;
+        align-items: center;
+    }
+} -->
+
+/* === スマホ版で種目別配点を非表示 === */
+@media (max-width: 1023px) {
+    /* 総合成績の種目別配点詳細を非表示 */
+    #team-overall .team-total-breakdown {
+        display: none !important;
+    }
+    
+    /* 総合配点のみ表示 */
+    #team-overall .team-total-overall {
+        font-size: 7vw !important;
+        margin-left: 0 !important;
+    }
+}
+
+/* === PC版では種目別配点を表示 === */
+@media (min-width: 1024px) {
+    /* PC版は既存のスタイルを維持 */
+    #team-overall .team-total-breakdown {
+        display: inline-flex !important;
+        align-items: center;
+    }
+}
