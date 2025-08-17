@@ -191,10 +191,13 @@ function parsePlayersData(sheet, discipline) {
   const players = [];
 
   data.forEach(row => {
+    // Bib番号（列E = インデックス4）が "-" の選手は除外
+    if (row[4] === "-") return;
+    
     if (!row[5] || !row[6]) return;
     if (row[22] === "RPO") return;
 
-    // 順位の取得（修正：デフォルトを900に）
+    // 順位の取得（列C = インデックス2）
     const pos = Number(row[2]) || 900;
 
     // 900以上（初期値・DNS）は除外
@@ -212,25 +215,20 @@ function parsePlayersData(sheet, discipline) {
 
     players.push({
       discipline: discipline,
-      team: row[6],
-      name: row[5],
-      pos: pos,
-      r1: Number(row[7]) || 0,
-      r2: Number(row[8]) || 0,
-      r3: Number(row[9]) || 0,
-      r4: Number(row[10]) || 0,
-      total: Number(row[17]) || 0,
-      updateTime: updateTimeString // 文字列として保存
+      team: row[6],  // 列G: Nat（チーム名）
+      name: row[5],  // 列F: Name
+      pos: pos,      // 列C: Pos
+      r1: Number(row[7]) || 0,   // 列H: R1
+      r2: Number(row[8]) || 0,   // 列I: R2
+      r3: Number(row[9]) || 0,   // 列J: R3
+      r4: Number(row[10]) || 0,  // 列K: R4
+      total: Number(row[17]) || 0,  // 列R: Total
+      updateTime: updateTimeString
     });
   });
   return players;
 }
 
-/**
- * 選手データから団体戦の結果を計算する
- * @param {Array<object>} players - 全選手オブジェクトの配列
- * @returns {object} 計算された団体戦の結果
- */
 /**
  * 選手データから団体戦の結果を計算する
  * @param {Array<object>} players - 全選手オブジェクトの配列
