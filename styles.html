@@ -930,7 +930,7 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
         margin: 0 0.5vh;
     }
     .team-total-overall {
-        font-size: 3.5vh;  /* 3.9vh → 3.5vh 少し縮小 */
+        font-size: 4.2vh;  /* 3.9vh → 3.5vh 少し縮小 */
         margin-left: 0.8vh;
     }
     /* PC版：3カラムのカードの高さを統一するスタイル */
@@ -1306,5 +1306,24 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
     #team-overall .team-total-breakdown {
         display: inline-flex !important;
         align-items: center;
+    }
+}
+
+
+
+@media (min-width: 1024px) {
+    /* 既存のスタイル... */
+    
+    /* 総合成績のボタンの上下パディングを種目別と完全一致させる */
+    #team-overall .bg-card > button {
+        padding-top: 0.8vh !important;  /* py-2と同じ値 */
+        padding-bottom: 0.8vh !important;  /* py-2と同じ値 */
+    }
+    
+    /* 種目別のヘッダー部分の上下パディングを明示的に指定 */
+    #team-trap-event .bg-card > div:first-child,
+    #team-skeet-event .bg-card > div:first-child {
+        padding-top: 0.8vh !important;
+        padding-bottom: 0.8vh !important;
     }
 }

@@ -101,7 +101,7 @@
     </div>
   </footer>
 
-  <script>
+<script>
     // スコアカラーリング関数 - インラインスタイルで確実に適用
     function getScoreStyle(score) {
         switch (score) {
@@ -207,7 +207,7 @@
                                   ${team.players.map(p => `
                                       <tr data-team="${team.name}" data-player="${p.name}">
                                           <td class="py-0-5 player-score" style="color: #F3F4F6 !important;">${p.rank}</td>
-                                          <td class="py-0-5 pl-0 player-name" style="color: #F3F4F6 !important;">${p.name}<span class="player-pos"> (${p.pos})</span></td>
+                                          <td class="py-0-5 pl-0 player-name" style="color: #F3F4F6 !important;">${p.name}</td>
                                           <td class="text-right py-0-5 player-score" style="${getScoreStyle(p.r1)}">${p.r1}</td>
                                           <td class="text-right py-0-5 player-score" style="${getScoreStyle(p.r2)}">${p.r2}</td>
                                           <td class="text-right py-0-5 player-score" style="${getScoreStyle(p.r3)}">${p.r3}</td>
@@ -286,7 +286,7 @@
                                         ${team.trapPlayers.map(p => `
                                             <tr data-team="${team.name}" data-player="${p.name}" style="color: #F3F4F6 !important;">
                                                 <td class="py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="color: #F3F4F6 !important;">${p.rank}</td>
-                                                <td class="py-0-5 lg-py-0 pl-0 player-name lg-text-xs lg-leading-tight" style="color: #F3F4F6 !important;">${p.name}<span class="player-pos"> (${p.pos})</span></td>
+                                                <td class="py-0-5 lg-py-0 pl-0 player-name lg-text-xs lg-leading-tight" style="color: #F3F4F6 !important;">${p.name}</td>
                                                 <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r1)}">${p.r1}</td>
                                                 <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r2)}">${p.r2}</td>
                                                 <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r3)}">${p.r3}</td>
@@ -321,7 +321,7 @@
                                         ${team.skeetPlayers.map(p => `
                                             <tr data-team="${team.name}" data-player="${p.name}" style="color: #F3F4F6 !important;">
                                                 <td class="py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="color: #F3F4F6 !important;">${p.rank}</td>
-                                                <td class="py-0-5 lg-py-0 pl-0 player-name lg-text-xs lg-leading-tight" style="color: #F3F4F6 !important;">${p.name}<span class="player-pos"> (${p.pos})</span></td>
+                                                <td class="py-0-5 lg-py-0 pl-0 player-name lg-text-xs lg-leading-tight" style="color: #F3F4F6 !important;">${p.name}</td>
                                                 <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r1)}">${p.r1}</td>
                                                 <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r2)}">${p.r2}</td>
                                                 <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r3)}">${p.r3}</td>
@@ -771,7 +771,8 @@
         audioManager.handleResize();
     });
 
-  </script>
+</script>
+
 </body>
 
 </html>
