@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>S-LIVE Results - Team</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=BIZ+UDGothic:wght@400;700&family=Noto+Sans+JP:wght@400;700&family=Ramabhadra&family=Arial:wght@400;700&display=swap"
+    rel="stylesheet">
+
+  <style>
+    <?!=include('styles');
+    ?>
+
+    /* 初期状態ではコンテンツを非表示 */
+    body {
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    body.loaded {
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body class="flex flex-col">
+
+  <header class="mobile-only header-gradient">
+    <img id="event-flag" src="" alt="Flag" class="hidden">
+    <h1 id="event-name" class="text-center"></h1>
+  </header>
+
+  <div class="fullscreen-container flex-grow">
+
+    <div class="mobile-only mb-2 border-b border-white-20">
+      <nav class="flex flex-wrap" style="margin-bottom: -1px;" aria-label="Tabs">
+        <button onclick="changeTab('team-trap')" class="tab active w-1-3 text-center py-2 px-1 border-b-2 border-transparent font-medium text-xs hover-bg-white-10 transition">
+                    トラップ
+                </button>
+        <button onclick="changeTab('team-skeet')" class="tab w-1-3 text-center py-2 px-1 border-b-2 border-transparent font-medium text-xs hover-bg-white-10 transition">
+                    スキート
+                </button>
+        <button onclick="changeTab('team-overall')" class="tab w-1-3 text-center py-2 px-1 border-b-2 border-transparent font-medium text-xs hover-bg-white-10 transition">
+                    総合成績
+                </button>
+      </nav>
+    </div>
+
+    <main class="pb-2 lg-pb-0 lg-h-full">
+      <div class="lg-grid lg-grid-cols-3 lg-gap-2 lg-h-full">
+
+        <!-- トラップ種目団体セクション -->
+        <div id="team-trap" class="tab-content lg-block lg-h-full lg-overflow-y-auto">
+          <h2 class="section-title desktop-only text-lg font-bold mb-1" style="color: #c855e3;text-align: center;">
+            <img src="https://s-live.org/wp-content/plugins/s-live/resource/TRAP.png" class="event-badge-img event-badge-trap inline">トラップ種目 団体
+            <span id="trap-status-icon" class="status-icon ml-2"></span>
+          </h2>
+          <div id="team-trap-event" class="space-y-1"></div>
+        </div>
+
+        <!-- スキート種目団体セクション -->
+        <div id="team-skeet" class="tab-content hidden lg-block lg-h-full lg-overflow-y-auto">
+          <h2 class="section-title desktop-only text-lg font-bold mb-1" style="color: #eebf35;text-align: center;">
+            <img src="https://s-live.org/wp-content/plugins/s-live/resource/SKEET.png" class="event-badge-img event-badge-skeet inline">スキート種目 団体
+            <span id="skeet-status-icon" class="status-icon ml-2"></span>
+          </h2>
+          <div id="team-skeet-event" class="space-y-1"></div>
+        </div>
+
+        <!-- 総合成績団体セクション -->
+        <div id="team-overall" class="tab-content hidden lg-block lg-h-full lg-overflow-y-auto">
+          <h2 class="section-title desktop-only text-lg font-bold mb-1 text-green-400" style="text-align: center;">
+            <img src="https://s-live.org/wp-content/plugins/s-live/resource/TEAM.png" class="event-badge-img event-badge-team inline">総合成績 団体
+            <span id="overall-status-icon" class="status-icon ml-2"></span>
+          </h2>
+          <div id="team-overall-results" class="space-y-1"></div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <footer class="mobile-only bg-footer p-1 fixed bottom-0 left-0 right-0 text-white-80">
+    <div class="container mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <div class="text-left">
+          <div id="event-place" class="text-sm font-bold"></div>
+          <div id="event-weather" class="text-xs"></div>
+        </div>
+      </div>
+      <div class="flex items-center">
+        <img id="qr-code" src="" class="h-12 w-12 bg-white p-0-5">
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // スコアカラーリング関数 - インラインスタイルで確実に適用
+    function getScoreStyle(score) {
+        switch (score) {
+            case 23: return 'color: RGB(101, 255, 255) !important;';
+            case 24: return 'color: RGB(255, 153, 229) !important; text-decoration: underline solid !important;';
+            case 25: return 'color: RGB(255, 255, 101) !important; text-decoration: underline double !important;';
+            default: return 'color: #F3F4F6 !important;';
+        }
+    }
+    
+    // 合計スコア用のカラーリング関数
+    function getTotalScoreStyle(score, defaultColor) {
+        switch (score) {
+            case 23: return 'color: RGB(101, 255, 255) !important;';
+            case 24: return 'color: RGB(255, 153, 229) !important; text-decoration: underline solid !important;';
+            case 25: return 'color: RGB(255, 255, 101) !important; text-decoration: underline double !important;';
+            default: return `color: ${defaultColor} !important;`;
+        }
+    }
+
+    // チーム名からアイコンURLを取得する関数
+    function getTeamIconUrl(teamName) {
+        const baseUrl = "https://s-live.org/wp-content/plugins/s-live/resource/flag/";
+        return `${baseUrl}${teamName}.png`; 
+    }
+
+    // 画像をプリロードする関数
+    function preloadImages(urls) {
+        return Promise.all(urls.map(url => {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(url);
+                img.onerror = () => {
+                    resolve(url); // エラーでも処理を続行
+                };
+                img.src = url;
+            });
+        }));
+    }
+
+    // すべての必要な画像URLを収集する関数
+    function collectImageUrls(data) {
+        const urls = new Set();
+        
+        // ヘッダー画像
+        if (data.eventInfo.flagUrl) {
+            urls.add(data.eventInfo.flagUrl);
+        }
+        if (data.eventInfo.qrCodeUrl) {
+            urls.add(data.eventInfo.qrCodeUrl);
+        }
+        
+        // バッジ画像
+        urls.add('https://s-live.org/wp-content/plugins/s-live/resource/TRAP.png');
+        urls.add('https://s-live.org/wp-content/plugins/s-live/resource/SKEET.png');
+        urls.add('https://s-live.org/wp-content/plugins/s-live/resource/TEAM.png');
+        
+        // チームアイコン
+        const allTeams = [
+            ...(data.teamEvent.trap || []),
+            ...(data.teamEvent.skeet || []),
+            ...(data.teamOverall || [])
+        ];
+        
+        allTeams.forEach(team => {
+            if (team.name) {
+                urls.add(getTeamIconUrl(team.name));
+            }
+        });
+        
+        return Array.from(urls);
+    }
+
+    function renderTeamEvent(data, targetId, color) {
+      const container = document.getElementById(targetId);
+      if (!data || data.length === 0) {
+          container.innerHTML = '<p class="text-gray-400 text-center p-4">競技開始をお待ちください</p>';
+          return;
+      }
+
+      container.innerHTML = data.map((team) => `
+          <div class="bg-card backdrop-blur-sm rounded-lg shadow-lg border border-white-20" 
+              data-team-card="${team.name}">
+              <div class="w-full flex justify-between items-center px-6 py-2 lg-py-1 text-left font-bold" style="color: #F3F4F6 !important;">
+                  <div class="flex items-center justify-center">
+                      <span class="team-rank w-8 text-left text-lg lg-text-base" style="color: #F3F4F6 !important;">${team.rank}</span>
+                      <img src="${getTeamIconUrl(team.name)}" alt="${team.name} icon" class="team-icon-style">
+                      <span class="team-name flex-1 pr-4 text-center lg-text-base" style="color: #F3F4F6 !important;">${team.name}</span>
+                  </div>
+                  <div class="flex items-center justify-center">
+                      <span class="team-total text-xl lg-text-lg mr-0" style="${getTotalScoreStyle(team.total, color)}">${team.total}</span>
+                  </div>
+              </div>
+
+              <div class="pb-2">
+                  <div class="px-6">
+                      <div class="overflow-x-auto">
+                          <table class="w-full text-sm min-w-300 table-fixed">
+                              <colgroup>
+                                  <col style="width: 7% !important;">   <col style="width: 40% !important;">  <col style="width: 8% !important;">   <col style="width: 8% !important;">   <col style="width: 8% !important;">   <col style="width: 8% !important;">   <col style="width: 13% !important;">
+                              </colgroup>
+                              <tbody class="divide-y">
+                                  ${team.players.map(p => `
+                                      <tr data-team="${team.name}" data-player="${p.name}">
+                                          <td class="py-0-5 player-score" style="color: #F3F4F6 !important;">${p.rank}</td>
+                                          <td class="py-0-5 pl-0 player-name" style="color: #F3F4F6 !important;">${p.name}<span class="player-pos"> (${p.pos})</span></td>
+                                          <td class="text-right py-0-5 player-score" style="${getScoreStyle(p.r1)}">${p.r1}</td>
+                                          <td class="text-right py-0-5 player-score" style="${getScoreStyle(p.r2)}">${p.r2}</td>
+                                          <td class="text-right py-0-5 player-score" style="${getScoreStyle(p.r3)}">${p.r3}</td>
+                                          <td class="text-right py-0-5 player-score" style="${getScoreStyle(p.r4)}">${p.r4}</td>
+                                          <td class="text-right lg-text-center py-0-5 pr-0 font-bold player-score">
+                                              <span class="score-value" style="${getTotalScoreStyle(p.total, color)}">${p.total}</span>
+                                          </td>
+                                      </tr>
+                                  `).join('')}
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      `).join('');
+    }
+
+    function renderTeamOverall(data, targetId) {
+        const container = document.getElementById(targetId);
+        if (!data || data.length === 0) {
+            container.innerHTML = '<p class="text-gray-400 text-center p-4">競技開始をお待ちください</p>';
+            return;
+        }
+            container.innerHTML = data.map(team => `
+                <div class="bg-card backdrop-blur-sm rounded-lg shadow-lg border border-white-20"
+                    data-team-card="${team.name}">
+                    <button onclick="toggleAccordion(this)" class="w-full flex justify-between items-center px-6 py-2 lg-py-1 text-left font-bold" style="color: #F3F4F6 !important;">
+                    <div class="flex items-center justify-center">
+                        <span class="team-rank w-8 text-left text-lg lg-text-base">${team.rank}</span>
+                        <img src="${getTeamIconUrl(team.name)}" alt="${team.name} icon" class="team-icon-style">
+                        <span class="team-name flex-1 pr-4 text-center lg-text-base">${team.name}</span>
+                    </div>
+                    <div class="flex items-center justify-end team-total-container">
+                        <div class="team-total-breakdown">
+                            <span style="color: #c855e3 !important;">${team.trapTotal}</span>
+                            <span class="total-separator"> + </span>
+                            <span style="color: #eebf35 !important;">${team.skeetTotal}</span>
+                            <span class="total-separator">:</span>
+                        </div>
+                        <span class="team-total-overall" style="${getTotalScoreStyle(team.overallTotal, '#4ade80')}">
+                            ${team.overallTotal}
+                        </span>
+                        <i class="fa-solid fa-chevron-down accordion-chevron transition-transform duration-300"></i>
+                    </div>
+                </button>
+                <div class="accordion-content">
+                    <div class="px-6">
+                        <div class="lg-grid lg-grid-cols-2 lg-gap-4">
+                            <div class="mb-4 lg-mb-1">
+                                <h4 class="font-bold mb-2 lg-mb-1 text-sm lg-font-black" style="color: #c855e3;">
+                                    <img src="https://s-live.org/wp-content/plugins/s-live/resource/TRAP.png" class="team-score-badge trap inline">
+                                    トラップ: <span style="${getTotalScoreStyle(team.trapTotal, '#c855e3')}">${team.trapTotal}点</span>
+                                </h4>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-sm table-fixed">
+                                        <colgroup>
+                                            <col style="width: 12% !important;">  <col style="width: 43% !important;">  <col style="width: 8% !important;">   <col style="width: 8% !important;">   <col style="width: 8% !important;">   <col style="width: 8% !important;">   <col style="width: 13% !important;">
+                                        </colgroup>
+                                        <tbody class="divide-y">
+                                            ${team.trapPlayers.map(p => `
+                                                <tr data-team="${team.name}" data-player="${p.name}" style="color: #F3F4F6 !important;">
+                                                    <td class="py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="color: #F3F4F6 !important;">${p.rank}</td>
+                                                    <td class="py-0-5 lg-py-0 pl-0 player-name lg-text-xs lg-leading-tight" style="color: #F3F4F6 !important;">${p.name}<span class="player-pos"> (${p.pos})</span></td>
+                                                    <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r1)}">${p.r1}</td>
+                                                    <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r2)}">${p.r2}</td>
+                                                    <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r3)}">${p.r3}</td>
+                                                    <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r4)}">${p.r4}</td>
+                                                    <td class="text-right lg-text-center py-0-5 lg-py-0 pr-0 font-bold player-score lg-text-xs lg-leading-tight">
+                                                        <span class="score-value" style="${getTotalScoreStyle(p.total, '#c855e3')}">${p.total}</span>
+                                                    </td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="font-bold mb-2 lg-mb-1 text-sm lg-font-black" style="color: #eebf35;">
+                                    <img src="https://s-live.org/wp-content/plugins/s-live/resource/SKEET.png" class="team-score-badge skeet inline">
+                                    スキート: <span style="${getTotalScoreStyle(team.skeetTotal, '#eebf35')}">${team.skeetTotal}点</span>
+                                </h4>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-sm table-fixed">
+                                        <colgroup>
+                                            <col style="width: 12% !important;">  <col style="width: 43% !important;">  <col style="width: 8% !important;">   <col style="width: 8% !important;">   <col style="width: 8% !important;">   <col style="width: 8% !important;">   <col style="width: 13% !important;">
+                                        </colgroup>
+                                        <tbody class="divide-y">
+                                            ${team.skeetPlayers.map(p => `
+                                                <tr data-team="${team.name}" data-player="${p.name}" style="color: #F3F4F6 !important;">
+                                                    <td class="py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="color: #F3F4F6 !important;">${p.rank}</td>
+                                                    <td class="py-0-5 lg-py-0 pl-0 player-name lg-text-xs lg-leading-tight" style="color: #F3F4F6 !important;">${p.name}<span class="player-pos"> (${p.pos})</span></td>
+                                                    <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r1)}">${p.r1}</td>
+                                                    <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r2)}">${p.r2}</td>
+                                                    <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r3)}">${p.r3}</td>
+                                                    <td class="text-right py-0-5 lg-py-0 player-score lg-text-xs lg-leading-tight" style="${getScoreStyle(p.r4)}">${p.r4}</td>
+                                                    <td class="text-right lg-text-center py-0-5 lg-py-0 pr-0 font-bold player-score lg-text-xs lg-leading-tight">
+                                                        <span class="score-value" style="${getTotalScoreStyle(p.total, '#eebf35')}">${p.total}</span>
+                                                    </td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderHeaderAndFooter(info) {
+        if (!info) return;
+        const eventName = document.getElementById('event-name');
+        if (eventName) eventName.textContent = info.name;
+        if (info.flagUrl) {
+            const flagImg = document.getElementById('event-flag');
+            if (flagImg) {
+                flagImg.src = info.flagUrl;
+                flagImg.classList.remove('hidden');
+            }
+        }
+        const eventPlace = document.getElementById('event-place');
+        if (eventPlace) eventPlace.textContent = info.place;
+        const eventWeather = document.getElementById('event-weather');
+        if (eventWeather) eventWeather.innerHTML = info.weather;
+        const qrCode = document.getElementById('qr-code');
+        if (qrCode) qrCode.src = info.qrCodeUrl;
+        
+        // PC版のみ：状況アイコンを表示
+        if (window.innerWidth >= 1024 && info.statusIcon) {
+            const trapIcon = document.getElementById('trap-status-icon');
+            const skeetIcon = document.getElementById('skeet-status-icon');
+            const overallIcon = document.getElementById('overall-status-icon');
+            
+            if (trapIcon) trapIcon.innerHTML = info.statusIcon;
+            if (skeetIcon) skeetIcon.innerHTML = info.statusIcon;
+            if (overallIcon) overallIcon.innerHTML = info.statusIcon;
+        }
+    }
+
+    // --- イベントハンドラ ---
+    function changeTab(tabName) {
+        if (window.innerWidth >= 1024) return;
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById(tabName).classList.remove('hidden');
+        document.querySelector(`button[onclick="changeTab('${tabName}')"]`).classList.add('active');
+    }
+
+    function toggleAccordion(buttonElement) {
+        if (window.innerWidth >= 1024) return;
+        const content = buttonElement.nextElementSibling;
+        const icon = buttonElement.querySelector('i');
+        if (content.style.maxHeight) {
+            content.style.maxHeight = null;
+            icon.classList.remove('rotate-180');
+        } else {
+            content.style.maxHeight = content.scrollHeight + "px";
+            icon.classList.add('rotate-180');
+        }
+    }
+    
+    function handleResize() {
+        if (window.innerWidth >= 1024) {
+            document.getElementById('team-trap').classList.remove('hidden');
+            document.getElementById('team-skeet').classList.remove('hidden');
+            document.getElementById('team-overall').classList.remove('hidden');
+            document.querySelectorAll('.accordion-content').forEach(content => {
+                content.style.maxHeight = 'none';
+            });
+            document.querySelectorAll('.accordion-chevron').forEach(icon => {
+                icon.classList.add('rotate-180');
+            });
+        } else {
+            const activeTab = document.querySelector('.tab.active');
+            if (activeTab) {
+                const tabName = activeTab.getAttribute('onclick').match(/'([^']+)'/)[1];
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+                document.getElementById(tabName).classList.remove('hidden');
+            }
+            document.querySelectorAll('.accordion-content').forEach(content => {
+                content.style.maxHeight = null;
+            });
+            document.querySelectorAll('.accordion-chevron').forEach(icon => {
+                icon.classList.remove('rotate-180');
+            });
+        }
+    }
+
+    // --- データ取得と画面描画 ---
+    // グローバルスコープで変数を定義
+    const spreadsheetId = '<?!=s?>';
+    const qrParam = '<?!=qr?>';
+    const waitingMinutes = 3 * 60 * 1000; // 点滅対象時間
+    let previousData = null; // チーム順位変動監視
+
+    // タイムスタンプベースの更新検知（完全版）
+    function detectAndHighlightChanges(newData) {
+        const now = new Date();
+        
+        // 順位変動アニメーションが実行中の場合は遅延させる
+        const isRankChanging = document.body.classList.contains('rank-changing');
+        const delay = isRankChanging ? 1500 : 500; // 順位変動中は1.5秒待つ
+        
+        // 各種目での更新時刻チェック（トラップ・スキート種目別）
+        ['trap', 'skeet'].forEach(discipline => {
+            newData.teamEvent[discipline].forEach(team => {
+                team.players.forEach(player => {
+                    if (player.updateTime) {
+                        // 文字列からDate型に変換（日本時間として解釈）
+                        const updateTime = new Date(player.updateTime);
+                        const diff = now - updateTime;
+                        
+                        if (diff >= 0 && diff <= waitingMinutes) {
+                            // タイミングを調整して点滅を開始
+                            setTimeout(() => {
+                                highlightPlayer(team.name, player.name);
+                            }, delay);
+                        }
+                    }
+                });
+            });
+        });
+        
+        // 総合成績での更新時刻チェック
+        newData.teamOverall.forEach(team => {
+            // トラップ選手（上位5名）
+            team.trapPlayers.forEach(player => {
+                if (player.updateTime) {
+                    const updateTime = new Date(player.updateTime);
+                    const diff = now - updateTime;
+                    
+                    if (diff >= 0 && diff <= waitingMinutes) {
+                        setTimeout(() => {
+                            highlightPlayer(team.name, player.name);
+                        }, delay);
+                    }
+                }
+            });
+            
+            // スキート選手（上位3名）
+            team.skeetPlayers.forEach(player => {
+                if (player.updateTime) {
+                    const updateTime = new Date(player.updateTime);
+                    const diff = now - updateTime;
+                    
+                    if (diff >= 0 && diff <= waitingMinutes) {
+                        setTimeout(() => {
+                            highlightPlayer(team.name, player.name);
+                        }, delay);
+                    }
+                }
+            });
+        });
+    }
+
+    function highlightPlayer(teamName, playerName) {
+        const selector = `tr[data-team="${teamName}"][data-player="${playerName}"]`;
+        const rows = document.querySelectorAll(selector);
+        
+        if (rows.length > 0) {
+            // 選手更新音を再生（PC版のみ）
+            audioManager.play('playerUpdate');
+            
+            rows.forEach(row => {
+                // 既存のクラスを一旦削除してから再追加（アニメーションリセット）
+                row.classList.remove('updnew');
+                void row.offsetWidth; // リフローを強制
+                row.classList.add('updnew');
+                
+                // 点滅をx分後に停止
+                setTimeout(() => {
+                    row.classList.remove('updnew');
+                }, waitingMinutes);
+            });
+        }
+    }
+
+    function fetchData() {
+        google.script.run
+            .withSuccessHandler(data => {
+                if (data.error) {
+                    console.error("Error from GAS: ", data.error);
+                    document.body.innerHTML = `<p class="text-red-500 p-4">データ取得エラー: ${data.error}</p>`;
+                    return;
+                }
+                
+                // 画像URLを収集
+                const imageUrls = collectImageUrls(data);
+                
+                // すべての画像をプリロードしてから表示
+                preloadImages(imageUrls).then(() => {
+                    renderHeaderAndFooter(data.eventInfo);
+                    renderTeamEvent(data.teamEvent.trap, 'team-trap-event', '#c855e3');
+                    renderTeamEvent(data.teamEvent.skeet, 'team-skeet-event', '#eebf35');
+                    renderTeamOverall(data.teamOverall, 'team-overall-results');
+                    
+                    handleResize();
+                    
+                    // タイムスタンプベースの更新検知（毎回実行）
+                    detectAndHighlightChanges(data);
+                    
+                    // 順位変動検知（2回目以降のデータ取得時）
+                    if (previousData) {
+                        detectRankChanges(data, previousData);
+                    }
+                    
+                    // 次回の比較用に現在のデータを保存（ディープコピー）
+                    previousData = JSON.parse(JSON.stringify(data));
+                    
+                    // コンテンツの表示
+                    document.body.classList.add('loaded');
+                });
+            })
+            .withFailureHandler(error => {
+                console.error("Error fetching data: ", error);
+                document.body.innerHTML = '<p class="text-red-500 p-4">データ取得エラー</p>';
+            })
+            .getTeamData(spreadsheetId, qrParam);
+    }
+
+    function detectRankChanges(newData, oldData) {
+        if (window.innerWidth < 1024) return; // PC版のみ
+        
+        const rankChanges = [];
+        
+        // トラップ・スキート種目別団体
+        ['trap', 'skeet'].forEach(discipline => {
+            const oldRankMap = new Map();
+            oldData.teamEvent[discipline].forEach(team => {
+                oldRankMap.set(team.name, team.rank);
+            });
+            
+            newData.teamEvent[discipline].forEach(team => {
+                const oldRank = oldRankMap.get(team.name);
+                if (oldRank && oldRank !== team.rank) {
+                    rankChanges.push({
+                        discipline,
+                        teamName: team.name,
+                        oldRank,
+                        newRank: team.rank,
+                        direction: team.rank < oldRank ? 'up' : 'down'
+                    });
+                }
+            });
+        });
+        
+        // 総合団体の順位変動を追加
+        const oldOverallMap = new Map();
+        oldData.teamOverall.forEach(team => {
+            oldOverallMap.set(team.name, team.rank);
+        });
+        
+        newData.teamOverall.forEach(team => {
+            const oldRank = oldOverallMap.get(team.name);
+            if (oldRank && oldRank !== team.rank) {
+                rankChanges.push({
+                    discipline: 'overall', // 総合を示す識別子
+                    teamName: team.name,
+                    oldRank,
+                    newRank: team.rank,
+                    direction: team.rank < oldRank ? 'up' : 'down'
+                });
+            }
+        });
+        
+        // アニメーション実行
+        if (rankChanges.length > 0) {
+            animateRankChanges(rankChanges);
+        }
+    }
+
+    // animateRankChanges関数に音声再生を追加
+    // animateRankChanges関数を修正
+    function animateRankChanges(changes) {
+        // ランク変動中フラグを立てる
+        document.body.classList.add('rank-changing');
+        
+        // 暗転用のクラスを追加
+        document.querySelectorAll('#team-trap-event .bg-card, #team-skeet-event .bg-card, #team-overall-results .bg-card').forEach(card => {
+            if (!changes.some(change => {
+                const selector = change.discipline === 'overall' 
+                    ? `#team-overall-results [data-team-card="${change.teamName}"]`
+                    : `#team-${change.discipline}-event [data-team-card="${change.teamName}"]`;
+                return card === document.querySelector(selector);
+            })) {
+                card.classList.add('darken-card');
+            }
+        });
+        
+        changes.forEach(change => {
+            const selector = change.discipline === 'overall' 
+                ? `#team-overall-results [data-team-card="${change.teamName}"]`
+                : `#team-${change.discipline}-event [data-team-card="${change.teamName}"]`;
+                
+            const card = document.querySelector(selector);
+            
+            if (card) {
+                // 移動距離を計算
+                const moveDistance = (change.oldRank - change.newRank) * card.offsetHeight;
+                
+                // CSSトランジションを設定
+                card.style.transition = 'transform 0.8s ease-in-out';
+                card.style.transform = `translateY(${moveDistance}px)`;
+                
+                // アニメーション完了後
+                setTimeout(() => {
+                    card.style.transition = '';
+                    card.style.transform = '';
+                    
+                    // 点滅開始（順位が上がった場合のみ）
+                    if (change.direction === 'up') {
+                        card.classList.add('rank-improved');
+                        
+                        // ランクアップ音を再生（PC版のみ）
+                        audioManager.play('rankUp');
+                        
+                        setTimeout(() => {
+                            card.classList.remove('rank-improved');
+                            
+                            // すべてのランクアップアニメーションが終了したら
+                            if (document.querySelectorAll('.rank-improved').length === 0) {
+                                // 暗転を解除（フェードアウトアニメーション付き）
+                                document.querySelectorAll('.darken-card').forEach(darkCard => {
+                                    darkCard.classList.add('lighten-card');
+                                    setTimeout(() => {
+                                        darkCard.classList.remove('darken-card', 'lighten-card');
+                                    }, 800); // フェードアウトアニメーション時間
+                                });
+                                
+                                setTimeout(() => {
+                                    document.body.classList.remove('rank-changing');
+                                }, 800);
+                            }
+                        }, 10000);
+                    }
+                }, 800);
+            }
+        });
+        
+        // ランクダウンしたカードのみの場合もフラグを外す
+        setTimeout(() => {
+            if (document.querySelectorAll('.rank-improved').length === 0) {
+                document.querySelectorAll('.darken-card').forEach(darkCard => {
+                    darkCard.classList.add('lighten-card');
+                    setTimeout(() => {
+                        darkCard.classList.remove('darken-card', 'lighten-card');
+                    }, 800);
+                });
+                
+                setTimeout(() => {
+                    document.body.classList.remove('rank-changing');
+                }, 800);
+            }
+        }, 1000);
+    }
+
+    // === 音声管理システム ===
+    // 外部サーバーの音声をGASプロキシ経由で取得するクラス
+    class ProxyAudioManager {
+        constructor() {
+            this.sounds = {};
+            this.enabled = window.innerWidth >= 1024;
+            this.volume = 0.3;
+            this.initialized = false;
+        }
+        
+        async init() {
+            if (!this.enabled || this.initialized) return;
+            
+            try {
+                // 音声ファイルをGAS経由で取得
+                const soundNames = ['rankUp', 'playerUpdate'];
+                
+                for (const soundName of soundNames) {
+                    const audioData = await new Promise((resolve, reject) => {
+                        google.script.run
+                            .withSuccessHandler(resolve)
+                            .withFailureHandler(reject)
+                            .getExternalSound(soundName);
+                    });
+                    
+                    if (audioData.success) {
+                        const audio = new Audio(`data:${audioData.mimeType};base64,${audioData.data}`);
+                        audio.volume = this.volume;
+                        audio.preload = 'auto';
+                        this.sounds[soundName] = audio;
+                    }
+                }
+                
+                this.initialized = true;
+                console.log('[音声] 初期化完了');
+            } catch (error) {
+                console.error('[音声] 初期化エラー:', error);
+                this.enabled = false;
+            }
+        }
+        
+        play(soundName) {
+            if (!this.enabled || !this.sounds[soundName]) return;
+            
+            try {
+                const audio = this.sounds[soundName].cloneNode();
+                audio.volume = this.volume;
+                audio.play().catch(() => {});
+            } catch (error) {
+                console.error('[音声] 再生エラー:', error);
+            }
+        }
+        
+        handleResize() {
+            this.enabled = window.innerWidth >= 1024;
+        }
+    }
+
+    // グローバルインスタンス
+    const audioManager = new ProxyAudioManager();
+
+    // --- 初期化処理 ---
+    document.addEventListener('DOMContentLoaded', () => {
+        // 最初のユーザー操作で音声を初期化（ブラウザの自動再生ポリシー対策）
+        document.body.addEventListener('click', async function initializeAudio() {
+            if (window.innerWidth >= 1024 && !audioManager.initialized) {
+                console.log('[音声] ユーザー操作を検知、初期化開始');
+                await audioManager.init();
+            }
+        }, { once: true });
+        
+        handleResize();
+        fetchData();
+        setInterval(fetchData, 30000);
+    });
+
+    // ウィンドウリサイズ時の処理に追加
+    window.addEventListener('resize', () => {
+        handleResize();
+        audioManager.handleResize();
+    });
+
+  </script>
+</body>
+
+</html>
