@@ -246,18 +246,18 @@
                     <div class="team-total-breakdown">
                         <!-- トラップの順位と配点 -->
                         <span style="color: #c855e3 !important;">
-                            ${team.trapRank ? team.trapPoints + '点' +'（' + team.trapRank + '位 ' + team.trapTotal + '）' : '-'}
+                            ${team.trapRank ? team.trapPoints + '' +'（' + team.trapRank + '位 ' + team.trapTotal + '）' : '-'}
                         </span>
                         <span class="total-separator"> + </span>
                         <!-- スキートの順位と配点 -->
                         <span style="color: #eebf35 !important;">
-                            ${team.skeetRank ? team.skeetPoints + '点' +'（' + team.skeetRank + '位 ' + team.skeetTotal + '）' : '-'}
+                            ${team.skeetRank ? team.skeetPoints + '' +'（' + team.skeetRank + '位 ' + team.skeetTotal + '）' : '-'}
                         </span>
                         <span class="total-separator"> = </span>
                     </div>
                     <!-- 総合配点 -->
                     <span class="team-total-overall" style="${getTotalScoreStyle(team.overallTotal, '#4ade80')}">
-                        ${team.overallTotal}点
+                        ${team.overallTotal}
                     </span>
                     <i class="fa-solid fa-chevron-down accordion-chevron transition-transform duration-300"></i>
                 </div>
@@ -268,8 +268,8 @@
                         <div class="mb-4 lg-mb-1">
                             <h4 class="font-bold mb-2 lg-mb-1 text-sm lg-font-black" style="color: #c855e3;">
                                 <img src="https://s-live.org/wp-content/plugins/s-live/resource/TRAP.png" class="team-score-badge trap inline">
-                                トラップ: <span style="${getTotalScoreStyle(team.trapTotal, '#c855e3')}">${team.trapTotal}点</span>
-                                ${team.trapRank ? ' (' + team.trapRank + '位:' + team.trapPoints + '点)' : ''}
+                                トラップ: <span style="${getTotalScoreStyle(team.trapTotal, '#c855e3')}">${team.trapTotal}</span>
+                                ${team.trapRank ? ' (' + team.trapRank + '位:' + team.trapPoints + ')' : ''}
                             </h4>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-sm table-fixed">
@@ -303,8 +303,8 @@
                         <div>
                             <h4 class="font-bold mb-2 lg-mb-1 text-sm lg-font-black" style="color: #eebf35;">
                                 <img src="https://s-live.org/wp-content/plugins/s-live/resource/SKEET.png" class="team-score-badge skeet inline">
-                                スキート: <span style="${getTotalScoreStyle(team.skeetTotal, '#eebf35')}">${team.skeetTotal}点</span>
-                                ${team.skeetRank ? ' (' + team.skeetRank + '位:' + team.skeetPoints + '点)' : ''}
+                                スキート: <span style="${getTotalScoreStyle(team.skeetTotal, '#eebf35')}">${team.skeetTotal}</span>
+                                ${team.skeetRank ? ' (' + team.skeetRank + '位:' + team.skeetPoints + ')' : ''}
                             </h4>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-sm table-fixed">

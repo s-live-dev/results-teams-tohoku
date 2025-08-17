@@ -1,5 +1,5 @@
 /* S-LIVE団体戦結果システム - viewport単位完全移行版 */
-/* 最終更新: 2025/07/18 - 全要素をviewport単位に変換 */
+/* 最終更新: 2025/01/22 - PC版視認性改善（Viewport対策＋文字サイズ拡大） */
 
 /* === ベースリセット === */
 * {
@@ -617,21 +617,22 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
 } /* === スマホ版メディアクエリ終了 === */
 
 /* === レスポンシブ：PC版（viewport単位） === */
+/* ★★★ PC版視認性改善 - 2025/01/22更新 ★★★ */
 @media (min-width: 1024px) {
     body {
         height: 100vh;
         overflow: hidden;
     }
     
-    /* テキストサイズ */
-    .text-xs { font-size: 1.2vh; line-height: 1.6vh; }
-    .text-sm { font-size: 1.4vh; line-height: 0.9; }
-    .text-lg { font-size: 1.8vh; line-height: 2.8vh; }
-    .text-xl { font-size: 2vh; line-height: 2.8vh; }
-    .text-2xl { font-size: 2.4vh; line-height: 3.2vh; }
-    .text-4xl { font-size: 3.6vh; line-height: 4vh; }
+    /* ★ テキストサイズ - 約1.5倍に拡大 */
+    .text-xs { font-size: 1.8vh; line-height: 2.4vh; }  /* 1.2vh → 1.8vh */
+    .text-sm { font-size: 2.1vh; line-height: 1.35; }   /* 1.4vh → 2.1vh */
+    .text-lg { font-size: 2.7vh; line-height: 4.2vh; }  /* 1.8vh → 2.7vh */
+    .text-xl { font-size: 3.0vh; line-height: 4.2vh; }  /* 2vh → 3.0vh */
+    .text-2xl { font-size: 3.6vh; line-height: 4.8vh; } /* 2.4vh → 3.6vh */
+    .text-4xl { font-size: 5.4vh; line-height: 6vh; }   /* 3.6vh → 5.4vh */
     
-    /* マージン・パディング */
+    /* マージン・パディング（現状維持） */
     .p-0-5 { padding: 0.2vh; }
     .p-1 { padding: 0.4vh; }
     .p-2 { padding: 0.8vh; }
@@ -656,7 +657,7 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
     .mx-auto { margin-left: auto; margin-right: auto; }
     .mr-0 { margin-right: 0; }
     
-    /* Gap（間隔） */
+    /* Gap（間隔）- 現状維持 */
     .gap-1rem { gap: 1.6vh; }
     
     /* 幅・高さ */
@@ -666,7 +667,7 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
     .h-12 { height: 4.8vh; }
     .min-w-300 { min-width: 32vh; }
     
-    /* スペーシング */
+    /* スペーシング - 現状維持 */
     .space-x-2 > * + * { margin-left: 0.8vh; }
     .space-x-4 > * + * { margin-left: 1.6vh; }
     .space-y-1 > * + * { margin-top: 0.3vh; }
@@ -688,16 +689,17 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
     .lg-grid { display: grid; }
     .lg-grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .lg-grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .lg-gap-2 { gap: 0.8vh; }
+    .lg-gap-2 { gap: 0.8vh; }  /* 現状維持 */
     .lg-gap-4 { gap: 1.6vh; }
     
     .lg-h-full { height: 100%; }
     .lg-overflow-y-auto { overflow-y: auto; }
     .lg-block { display: block !important; }
     
-    .lg-text-lg { font-size: 1.8vh !important; line-height: 2.8vh !important; }
-    .lg-text-base { font-size: 1.6vh !important; line-height: 2.4vh !important; }
-    .lg-text-xs { font-size: 1.2vh !important; }
+    /* ★ テキストサイズクラス - 拡大 */
+    .lg-text-lg { font-size: 2.7vh !important; line-height: 4.2vh !important; }  /* 1.8vh → 2.7vh */
+    .lg-text-base { font-size: 2.4vh !important; line-height: 3.6vh !important; }  /* 1.6vh → 2.4vh */
+    .lg-text-xs { font-size: 1.8vh !important; }  /* 1.2vh → 1.8vh */
     .lg-leading-tight { line-height: 1.25 !important; }
     
     .lg-py-1 { padding-top: 0.4vh !important; padding-bottom: 0.4vh !important; }
@@ -715,10 +717,11 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
     /* PC版では全タブコンテンツを表示 */
     .tab-content { display: block !important; }
     
-    /* 全画面活用 */
+    /* ★ 全画面活用 - Viewport対策（95vhに調整） */
     .fullscreen-container {
-        height: 100vh;
+        height: calc(100vh - 2vh);  /* 下部2vh分の安全マージン */
         padding: 0.8vh;
+        padding-bottom: 2vh;  /* 下部余白を確保 */
         margin: 0;
         max-width: 100%;
     }
@@ -735,19 +738,26 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
         display: none !important;
     }
     
-    /* PC版射撃競技特有要素 */
-    .team-header { font-size: 2vh !important; }
-    .team-rank { font-size: 2.4vh !important; }
-    .team-name { font-size: 2vh !important; }
-    .team-total { font-size: 2.8vh !important; }
-    .player-name { font-size: 2vh !important; padding-right: 0.8vh !important; }
+    /* ★ PC版射撃競技特有要素 - 大幅拡大 */
+    .team-header { font-size: 3.0vh !important; }  /* 2vh → 3.0vh */
+    .team-rank { font-size: 3.6vh !important; }    /* 2.4vh → 3.6vh */
+    .team-name { font-size: 3.0vh !important; }    /* 2vh → 3.0vh */
+    .team-total { font-size: 4.2vh !important; }   /* 2.8vh → 4.2vh */
+    .player-name { 
+        font-size: 2.6vh !important;  /* 2vh → 2.6vh */
+        padding-right: 0.8vh !important; 
+    }
     .player-score { 
-        font-size: 2vh !important;
+        font-size: 2.6vh !important;  /* 2vh → 2.6vh */
         padding-left: 0.2vh !important;
         padding-right: 0.2vh !important;
     }
 
-    .section-title { font-size: 2.4vh !important; margin-top: 0; margin-bottom: 0.8vh !important; }
+    .section-title { 
+        font-size: 3.6vh !important;  /* 2.4vh → 3.6vh */
+        margin-top: 0; 
+        margin-bottom: 0.8vh !important; 
+    }
     
     /* PC版でのテーブル列幅の強制設定 */
     .player-score:last-child {
@@ -786,12 +796,12 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
         box-sizing: border-box !important;
     }
     
-    /* PC版での種目アイコンサイズ調整 */
-    .section-title .event-badge-img { height: 1.92vh !important; }
+    /* ★ PC版での種目アイコンサイズ調整 - 拡大 */
+    .section-title .event-badge-img { height: 2.88vh !important; }  /* 1.92vh → 2.88vh */
     
-    /* 種目バッジ画像 */
+    /* ★ 種目バッジ画像 - 拡大 */
     .event-badge-img {
-        height: 1.92vh;
+        height: 2.88vh;  /* 1.92vh → 2.88vh */
         margin-right: 0.8vh;
         vertical-align: middle;
         border-radius: 0.4vh;
@@ -805,7 +815,7 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
     .event-badge-team { border: 0.15vh solid #22c55e; }
     
     .team-score-badge {
-        height: 1.76vh !important;
+        height: 2.64vh !important;  /* 1.76vh → 2.64vh */
         margin-right: 0.4vh !important;
         vertical-align: middle;
         border-radius: 0.4vh;
@@ -845,30 +855,46 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
 
     /* === 総合成績セクション内の選手テーブル専用スタイル (PC) === */
 
-    /* 「トラップ:」「スキート:」ヘッダーのフォントと下余白を調整 */
+    /* ★ 「トラップ:」「スキート:」ヘッダーのフォントと下余白を調整 - 拡大 */
     #team-overall .accordion-content h4 {
-        font-size: 1.5vh !important;
+        font-size: 2.25vh !important;  /* 1.5vh → 2.25vh */
         margin-bottom: 0.4vh !important;
     }
 
-    /* 選手テーブルのセルの上下余白を詰めて行の高さを縮小 */
+    /* 選手テーブルのセルの上下余白を適度に確保 */
     #team-overall .accordion-content td {
-        padding-top: 0.05vh !important;
-        padding-bottom: 0.05vh !important;
-        line-height: 0.9 !important;
+        padding-top: 0.2vh !important;  /* 0.05vh → 0.2vh 余白を増やす */
+        padding-bottom: 0.2vh !important;  /* 0.05vh → 0.2vh 余白を増やす */
+        line-height: 1.2 !important;  /* 0.9 → 1.2 行高さを調整 */
         vertical-align: middle !important;
     }
 
-    /* 選手テーブルのフォントサイズを調整 */
+    /* ★ 選手テーブルのフォントサイズを調整 - 折り返し防止のため縮小 */
     #team-overall .accordion-content .lg-text-xs {
-        font-size: 1.3vh !important;
+        font-size: 1.6vh !important;  /* 1.95vh → 1.6vh 折り返し防止 */
+    }
+    
+    /* 総合成績の選手テーブルの行間を広げる */
+    #team-overall .accordion-content tr {
+        line-height: 1.4 !important;  /* 行間を広げて見やすく */
+    }
+    
+    /* 総合成績のヘッダーと選手リストの間に余白を追加 */
+    #team-overall .accordion-content {
+        padding-top: 1.2vh !important;  /* ヘッダーとの間隔を確保 */
     }
 
-    /* PC版: 総合成績チーム名ヘッダーの余白を削除し、垂直中央揃えを維持 */
+    /* PC版: 総合成績チーム名ヘッダーを種目別と統一 */
     #team-overall .bg-card > button {
         padding-top: 0 !important;
         padding-bottom: 0 !important;
-        min-height: 3.5vh; /* 中央揃えを機能させるための最小高さを確保 */
+        min-height: unset !important; /* 最小高さを削除して種目別と同じに */
+    }
+    
+    /* 総合成績の行高さを種目別と統一 */
+    #team-overall .team-rank,
+    #team-overall .team-name {
+        line-height: 1 !important; /* 行高さを最小化 */
     }
     /* PC版: 総合成績セクション、ヘッダー下の見出し(h4)が持つ不要な上マージンを削除 */
     #team-overall .accordion-content h4 { margin-top: 0 !important; }
@@ -889,37 +915,46 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
     .lg-flex {
         display: flex !important;
     }
-    /* PC版: 新しい合計点表示のスタイル */
+    /* ★ PC版: 新しい合計点表示のスタイル - 最適化 */
     .team-total-container {
         font-weight: 700;
+        align-items: center;  /* 垂直中央揃え */
+        flex-wrap: nowrap;    /* 折り返し禁止 */
     }
     .team-total-breakdown {
-        font-size: 2.0vh;
+        font-size: 2.2vh;  /* 3.0vh → 2.2vh 控えめに縮小 */
+        white-space: nowrap;  /* 折り返し防止 */
     }
     .total-separator {
         color: rgba(255,255,255,0.8);
         margin: 0 0.5vh;
     }
     .team-total-overall {
-        font-size: 2.6vh;
+        font-size: 3.5vh;  /* 3.9vh → 3.5vh 少し縮小 */
         margin-left: 0.8vh;
     }
     /* PC版：3カラムのカードの高さを統一するスタイル */
     #team-trap, #team-skeet, #team-overall {
         display: flex !important;
         flex-direction: column !important;
+        height: 100%; /* 高さを明示的に100%に */
     }
 
     #team-trap-event, #team-skeet-event, #team-overall-results {
         flex-grow: 1;
         display: flex;
         flex-direction: column;
+        gap: 0.3vh; /* カード間の統一された間隔 */
     }
 
+    /* すべてのカードを同じ高さに揃える */
     #team-trap-event > .bg-card,
     #team-skeet-event > .bg-card,
     #team-overall-results > .bg-card {
-        flex-grow: 1;
+        flex: 1; /* flex-growからflexに変更して均等配分 */
+        display: flex;
+        flex-direction: column;
+        min-height: 0; /* flexboxの縮小を許可 */
     }
     /* PC版: 入れ子にしたdivが原因のレイアウト崩れを防止 */
     .accordion-content .px-6 {
@@ -953,11 +988,31 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
         padding-right: 0.0vw !important;
     }
 
-    /* PC版では個人順位を表示 */
+    /* ★ PC版では個人順位を表示 - 拡大 */
     .player-pos {
         display: inline !important;
         color: rgba(255, 255, 255, 0.7) !important;
-        font-size: 1.2vh !important;
+        font-size: 1.8vh !important;  /* 1.2vh → 1.8vh */
+    }
+    
+    /* ★ 総合成績セクションでは個人順位を非表示（折り返し防止） */
+    #team-overall .player-pos {
+        display: none !important;
+    }
+
+    /* ★ 状況アイコン - 拡大 */
+    .status-icon {
+        display: inline-block;
+        font-size: 3.0vh;  /* 2.0vh → 3.0vh */
+        vertical-align: middle;
+        transform: translateY(-0.3vh);
+        line-height: 1;
+    }
+    
+    .status-icon i {
+        display: inline-block;
+        vertical-align: middle;
+        line-height: inherit;
     }
 
 } /* === PC版メディアクエリ終了 ===*/
@@ -981,10 +1036,11 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
 
 /* === レスポンシブ：PC版 === */
 @media (min-width: 1024px) {
+  /* ★ チームアイコン - 拡大 */
   .team-icon-style {
-    height: 2.8vh; /* チーム名のフォントサイズ(2vh)に合わせる */
-    width: 2.8vh;
-    margin-right: 0.8vh; /* 右側の余白 */
+    height: 4.2vh;  /* 2.8vh → 4.2vh */
+    width: 4.2vh;   /* 2.8vh → 4.2vh */
+    margin-right: 0.8vh;
   }
 }
 /* カードヘッダーのフォントファミリーを Arial に統一 */
@@ -996,23 +1052,6 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
 }
 
 /* 順位上昇時の強調アニメーション（PC版のみ） */
-<!-- @media (min-width: 1024px) {
-    .rank-improved {
-        animation: rankUpGlow 12s ease-out;
-    }
-    
-    @keyframes rankUpGlow {
-        0% {
-            box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
-        }
-        50% {
-            box-shadow: 0 0 20px 10px rgba(0, 0, 255, 0.6);
-        }
-        100% {
-            box-shadow: 0 0 0 0 rgba(255, 255 , 0, 0);
-        }
-    }
-} -->
 @media (min-width: 1024px) {
     /* ランクアップ時に他のカードを暗くする */
     .rank-changing #team-trap-event .bg-card:not(.rank-improved),
@@ -1214,20 +1253,6 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
               transform: translate(-50%, -70%) scale(0.8);
           }
       }
-
-    .status-icon {
-        display: inline-block;
-        font-size: 2.0vh;
-        vertical-align: middle;
-        transform: translateY(-0.3vh); /* 種目バッジと同じ垂直位置調整 */
-        line-height: 1; /* 行高さを最小化して垂直位置を安定させる */
-    }
-    
-    .status-icon i {
-        display: inline-block; /* 明示的にinline-blockを指定 */
-        vertical-align: middle;
-        line-height: inherit;
-    }
 }
 
 /* 選手更新時の点滅アニメーション - シンプルな明度変化のみ */
@@ -1260,34 +1285,6 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
         animation: blinkBrightness 1.5s infinite !important;
     }
 }
-
-<!-- /* === スマホ版で種目別配点を非表示 === */
-@media (max-width: 1023px) {
-    /* 総合成績の種目別配点詳細を非表示 */
-    #team-overall .team-total-breakdown {
-        display: none !important;
-    }
-    
-    /* 「=」記号も非表示 */
-    #team-overall .total-separator:last-of-type {
-        display: none !important;
-    }
-    
-    /* 総合配点のみ表示 */
-    #team-overall .team-total-overall {
-        font-size: 7vw !important;
-        margin-left: 0 !important;
-    }
-}
-
-/* === PC版では種目別配点を表示 === */
-@media (min-width: 1024px) {
-    /* PC版は既存のスタイルを維持 */
-    #team-overall .team-total-breakdown {
-        display: inline-flex !important;
-        align-items: center;
-    }
-} -->
 
 /* === スマホ版で種目別配点を非表示 === */
 @media (max-width: 1023px) {
