@@ -1,12 +1,20 @@
-/* S-LIVE団体戦結果システム - viewport単位完全移行版 */
-/* 最終更新: 2025/01/22 - PC版視認性改善（Viewport対策＋文字サイズ拡大） */
+/* S-LIVE団体戦結果システム - 東北ブロック完全版 */
+/* 最終更新: 2025/01/26 - Google TVブラウザ対応 */
 
-/* === ベースリセット === */
+/* ========================================
+   1. ベースリセット & 基本設定
+======================================== */
 * {
     box-sizing: border-box;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
-/* === S-LIVEオリジナルスタイル === */
+::-webkit-scrollbar { 
+    display: none; 
+}
+
 body {
     font-family: 'BIZ UDGothic', 'Noto Sans JP', sans-serif;
     background: linear-gradient(270deg, #1e2569, #19115d, #2b1364, #2d0535);
@@ -15,230 +23,97 @@ body {
     overflow-x: hidden;
     margin: 0;
     padding: 0;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
 }
 
-/* オリジナルのハイスコアカラーリング - 最優先適用 */
-.hl23 {
-    color: RGB(101, 255, 255) !important;
+body.loaded {
+    opacity: 1;
 }
 
-.hl24 {
-    color: RGB(255, 153, 229) !important;
-    text-decoration: underline solid !important;
-}
+/* ========================================
+   2. S-LIVEハイスコアカラーリング
+======================================== */
+.hl23 { color: RGB(101, 255, 255) !important; }
+.hl24 { color: RGB(255, 153, 229) !important; text-decoration: underline solid !important; }
+.hl25 { color: RGB(255, 255, 101) !important; text-decoration: underline double !important; }
 
-.hl25 {
-    color: RGB(255, 255, 101) !important;
-    text-decoration: underline double !important;
-}
+/* ========================================
+   3. レイアウトユーティリティ
+======================================== */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-grow { flex-grow: 1; }
+.flex-wrap { flex-wrap: wrap; }
+.flex-1 { flex: 1 1 0%; }
+.flex-shrink-0 { flex-shrink: 0; }
+.flex-shrink-1 { flex-shrink: 1; }
+.flex-grow-0 { flex-grow: 0; }
 
-/* ハイスコアクラス適用時はインラインスタイルよりも優先 */
-td.hl23, td.hl24, td.hl25 {
-    color: inherit !important;
-}
+.grid { display: grid; }
+.block { display: block; }
+.inline { display: inline; }
+.hidden { display: none; }
 
-span.hl23, span.hl24, span.hl25 {
-    color: inherit !important;
-}
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.items-center { align-items: center; }
 
-/* === レイアウトユーティリティ === */
-.flex {
-    display: flex;
-}
+.relative { position: relative; }
+.fixed { position: fixed !important; }
+.bottom-0 { bottom: 0 !important; }
+.left-0 { left: 0 !important; }
+.right-0 { right: 0 !important; }
+.inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
 
-.flex-col {
-    flex-direction: column;
-}
+/* ========================================
+   4. サイズユーティリティ
+======================================== */
+.w-full { width: 100%; }
+.w-1-3 { width: 33.333333%; }
+.w-auto { width: auto; }
+.h-full { height: 100%; }
+.container { width: 100%; max-width: 100%; margin: 0 auto; }
 
-.flex-grow {
-    flex-grow: 1;
-}
-
-.flex-wrap {
-    flex-wrap: wrap;
-}
-
-.grid {
-    display: grid;
-}
-
-.justify-center {
-    justify-content: center;
-}
-
-.justify-between {
-    justify-content: space-between;
-}
-
-.items-center {
-    align-items: center;
-}
-
-/* === 位置・表示 === */
-.fixed {
-    position: fixed !important;
-}
-
-.bottom-0 {
-    bottom: 0 !important;
-}
-
-.left-0 {
-    left: 0 !important;
-}
-
-.right-0 {
-    right: 0 !important;
-}
-
-.inset-0 {
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-}
-
-.relative {
-    position: relative;
-}
-
-.hidden {
-    display: none;
-}
-
-.block {
-    display: block;
-}
-
-.inline {
-    display: inline;
-}
-
-/* === 幅・高さ === */
-.w-full {
-    width: 100%;
-}
-
-.w-1-3 {
-    width: 33.333333%;
-}
-
-.w-auto {
-    width: auto;
-}
-
-.h-full {
-    height: 100%;
-}
-
-/* === フレックス・グリッドヘルパー === */
-.flex-1 {
-    flex: 1 1 0%;
-}
-
-.flex-shrink-0 {
-    flex-shrink: 0;
-}
-
-.flex-shrink-1 {
-    flex-shrink: 1;
-}
-
-.flex-grow-0 {
-    flex-grow: 0;
-}
-
-.container {
-    width: 100%;
-    max-width: 100%;
-    margin: 0 auto;
-}
-
-/* === 背景・色 === */
-.bg-overlay {
-    background-color: rgba(17, 24, 39, 0.8) !important;
-}
-
-.bg-card {
+/* ========================================
+   5. 色・背景ユーティリティ
+======================================== */
+.bg-overlay { background-color: rgba(17, 24, 39, 0.8) !important; }
+.bg-card { 
     background-color: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(4px) !important;
 }
+.bg-footer { background-color: rgba(0, 0, 0, 0.3) !important; }
+.bg-white { background-color: white !important; }
 
-.bg-footer {
-    background-color: rgba(0, 0, 0, 0.3) !important;
-}
+.text-white { color: white !important; }
+.text-gray-200 { color: #e5e7eb !important; }
+.text-gray-400 { color: #9ca3af !important; }
+.text-white-80 { color: rgba(255, 255, 255, 0.8) !important; }
+.text-green-400 { color: #4ade80 !important; }
+.text-red-500 { color: #ef4444 !important; }
 
-.bg-white {
-    background-color: white !important;
-}
+/* ========================================
+   6. タイポグラフィ
+======================================== */
+.font-bold { font-weight: 700; }
+.font-medium { font-weight: 500; }
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
 
-.text-white {
-    color: white !important;
-}
+/* ========================================
+   7. ボーダー・エフェクト
+======================================== */
+.border-transparent { border-color: transparent; }
+.border-white-20 { border-color: rgba(255, 255, 255, 0.2); }
+.rounded-full { border-radius: 9999px; }
+.rounded-50 { border-radius: 50%; }
+.backdrop-blur-sm { backdrop-filter: blur(4px); }
 
-.text-gray-200 {
-    color: #e5e7eb !important;
-}
-
-.text-gray-400 {
-    color: #9ca3af !important;
-}
-
-.text-white-80 {
-    color: rgba(255, 255, 255, 0.8) !important;
-}
-
-/* オリジナルv1の種目別カラーリング復活 */
-.text-green-400 {
-    color: #4ade80 !important;
-}
-
-.text-red-500 {
-    color: #ef4444 !important;
-}
-
-/* === テキスト === */
-.font-bold {
-    font-weight: 700;
-}
-
-.font-medium {
-    font-weight: 500;
-}
-
-.text-center {
-    text-align: center;
-}
-
-.text-left {
-    text-align: left;
-}
-
-.text-right {
-    text-align: right;
-}
-
-/* === ボーダー・影 === */
-.border-transparent {
-    border-color: transparent;
-}
-
-.border-white-20 {
-    border-color: rgba(255, 255, 255, 0.2);
-}
-
-.rounded-full {
-    border-radius: 9999px;
-}
-
-.rounded-50 {
-    border-radius: 50%;
-}
-
-/* === エフェクト === */
-.backdrop-blur-sm {
-    backdrop-filter: blur(4px);
-}
-
+/* ========================================
+   8. トランジション・アニメーション
+======================================== */
 .transition {
     transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -251,49 +126,29 @@ span.hl23, span.hl24, span.hl25 {
     transition-duration: 150ms;
 }
 
-.duration-300 {
-    transition-duration: 300ms;
-}
+.duration-300 { transition-duration: 300ms; }
+.rotate-180 { transform: rotate(180deg); }
 
-.rotate-180 {
-    transform: rotate(180deg);
-}
+/* ========================================
+   9. オーバーフロー制御
+======================================== */
+.overflow-hidden { overflow: hidden; }
+.overflow-x-auto { overflow-x: auto; }
+.overflow-y-auto { overflow-y: auto; }
 
-/* === オーバーフロー === */
-.overflow-hidden {
-    overflow: hidden;
-}
+/* ========================================
+   10. Z-index
+======================================== */
+.z-50 { z-index: 50; }
+.z-1000 { z-index: 1000; }
 
-.overflow-x-auto {
-    overflow-x: auto;
-}
-
-.overflow-y-auto {
-    overflow-y: auto;
-}
-
-/* === Z-index === */
-.z-50 {
-    z-index: 50;
-}
-
-.z-1000 {
-    z-index: 1000;
-}
-
-/* === Hover効果 === */
+/* ========================================
+   11. インタラクティブ要素
+======================================== */
 .hover-bg-white-10:hover {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* === アコーディオン === */
-.accordion-content {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease-out;
-}
-
-/* ボタンデフォルトスタイル完全リセット */
 button {
     border: none !important;
     outline: none !important;
@@ -304,48 +159,12 @@ button {
     appearance: none !important;
     -webkit-appearance: none !important;
     -moz-appearance: none !important;
-}
-
-/* 動的生成要素への強制色設定 */
-button, span, div, td, th, tr {
     color: inherit !important;
 }
 
-/* JavaScript生成要素の確実な色設定 */
-[class*="team-"], [class*="player-"] {
-    color: #F3F4F6 !important;
-}
-
-/* テーブル要素の強制色設定 */
-table *, tbody *, tr *, td *, th * {
-    color: inherit !important;
-}
-
-/* アコーディオンヘッダーの背景色を強制適用 */
-.bg-card {
-    background-color: rgba(255, 255, 255, 0.1) !important;
-    backdrop-filter: blur(4px) !important;
-}
-
-.bg-card.backdrop-blur-sm {
-    background-color: rgba(255, 255, 255, 0.1) !important;
-    backdrop-filter: blur(4px) !important;
-}
-
-/* 都道府県行のテキスト色修正（チーム名のみ、スコア色は維持） */
-button.bg-card {
-    background-color: rgba(255, 255, 255, 0.1) !important;
-    background-image: none !important;
-    color: #F3F4F6 !important;
-}
-
-/* チーム名・順位のみ白色、スコア部分は除外 */
-button.bg-card .team-rank,
-button.bg-card .team-name {
-    color: #F3F4F6 !important;
-}
-
-/* === タブ === */
+/* ========================================
+   12. タブ・アコーディオン
+======================================== */
 .tab {
     color: #F3F4F6 !important;
     background-color: transparent !important;
@@ -358,60 +177,48 @@ button.bg-card .team-name {
     border-bottom-color: transparent !important;
 }
 
-/* 動的生成要素への最強制色設定 - ハイスコア除外 */
-.bg-card button:not(.hl23):not(.hl24):not(.hl25),
-.bg-card button *:not(.hl23):not(.hl24):not(.hl25),
-.bg-card span:not(.hl23):not(.hl24):not(.hl25),
-.bg-card div:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
-    color: #F3F4F6 !important;
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
 }
 
-/* テーブル内全要素の色強制 - ハイスコア除外 */
-tbody tr:not(.hl23):not(.hl24):not(.hl25),
-tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
-    color: #F3F4F6 !important;
-}
-
-/* ハイスコア要素は強制白文字から除外 */
-.hl23, .hl24, .hl25,
-.hl23 *, .hl24 *, .hl25 * {
-    color: inherit !important;
-}
-
-/* アコーディオン内容の色強制 - ハイスコア除外 */
-.accordion-content:not(.hl23):not(.hl24):not(.hl25),
-.accordion-content *:not(.hl23):not(.hl24):not(.hl25) {
-    <!-- color: inherit !important; -->
-}
-
-/* === スクロールバー非表示 === */
-::-webkit-scrollbar { 
-    display: none; 
-}
-
-* {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-
-/* === ヘッダーグラデーション === */
+/* ========================================
+   13. 共通コンポーネント
+======================================== */
 .header-gradient {
     background-image: radial-gradient(farthest-side at 50% 0%, rgb(80 91 208 / 50%), rgba(0, 0, 0, 0));
 }
 
-/* === テーブル固定レイアウト === */
 .table-fixed {
     table-layout: fixed !important;
     width: 100% !important;
 }
 
-/* === レスポンシブ：スマホ版（viewport単位） === */
+/* チームアイコン共通スタイル */
+.team-icon-style {
+    border-radius: 50%;
+    object-fit: cover;
+    vertical-align: middle;
+}
+
+/* チーム情報のフォント統一 */
+.team-rank,
+.team-name, 
+.team-total, 
+.team-total-container {
+    font-family: 'Arial', sans-serif !important;
+}
+
+/* ========================================
+   14. モバイル版（スマートフォン・タブレット）
+======================================== */
 @media (max-width: 1023px) {
     body {
         min-height: 100vh;
     }
     
-    /* テキストサイズ */
+    /* テキストサイズ（viewport単位） */
     .text-xs { font-size: 3vw; line-height: 4vw; }
     .text-sm { font-size: 3.5vw; line-height: 5vw; }
     .text-lg { font-size: 4.5vw; line-height: 7vw; }
@@ -419,19 +226,16 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
     .text-2xl { font-size: 6vw; line-height: 8vw; }
     .text-4xl { font-size: 9vw; line-height: 10vw; }
     
-    /* マージン・パディング */
+    /* パディング・マージン */
     .p-0-5 { padding: 0.5vw; }
     .p-1 { padding: 1vw; }
     .p-2 { padding: 2vw; }
     .p-4 { padding: 4vw; }
-    
     .px-1 { padding-left: 1vw; padding-right: 1vw; }
     .px-6 { padding-left: 6vw; padding-right: 6vw; }
-    
     .py-0-5 { padding-top: 0.5vw; padding-bottom: 0.5vw; }
     .py-1 { padding-top: 1vw; padding-bottom: 1vw; }
     .py-2 { padding-top: 2vw; padding-bottom: 2vw; }
-    
     .pl-0 { padding-left: 0; }
     .pr-0 { padding-right: 0; }
     .pr-4 { padding-right: 4vw; }
@@ -444,9 +248,6 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
     .mx-auto { margin-left: auto; margin-right: auto; }
     .mr-0 { margin-right: 0; }
     
-    /* Gap（間隔） */
-    .gap-1rem { gap: 4vw; }
-    
     /* 幅・高さ */
     .w-8 { width: 8vw; }
     .w-12 { width: 12vw; }
@@ -455,6 +256,7 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
     .min-w-300 { min-width: 75vw; }
     
     /* スペーシング */
+    .gap-1rem { gap: 4vw; }
     .space-x-2 > * + * { margin-left: 2vw; }
     .space-x-4 > * + * { margin-left: 4vw; }
     .space-y-1 > * + * { margin-top: 1vw; }
@@ -464,15 +266,17 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
     .border-b { border-bottom-width: 0.25vw; }
     .border-b-2 { border-bottom-width: 0.5vw; }
     .rounded-lg { border-radius: 2vw; }
-    .shadow-lg { box-shadow: 0 2.5vw 3.75vw -0.75vw rgba(0, 0, 0, 0.1), 0 1vw 1.5vw -0.5vw rgba(0, 0, 0, 0.05); }
+    .shadow-lg { 
+        box-shadow: 0 2.5vw 3.75vw -0.75vw rgba(0, 0, 0, 0.1), 
+                    0 1vw 1.5vw -0.5vw rgba(0, 0, 0, 0.05); 
+    }
     
-    /* 分割線 */
     .divide-y > * + * {
         border-top-width: 0.25vw;
         border-color: rgba(255, 255, 255, 0.2);
     }
     
-    /* フルスクリーンコンテナ */
+    /* レイアウト */
     .fullscreen-container {
         padding: 2vw;
         padding-bottom: 60vw;
@@ -485,23 +289,11 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
     
     .pb-2 { padding-bottom: 2vw; }
     
-    /* デスクトップ専用要素を非表示 */
-    .desktop-only {
-        display: none !important;
-    }
+    /* モバイル専用表示 */
+    .desktop-only { display: none !important; }
+    .mobile-only { display: block; }
     
-    /* スマートフォン版フッター固定強化 */
-    .mobile-only.bg-footer {
-        position: fixed !important;
-        bottom: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        z-index: 1000 !important;
-        width: 100% !important;
-        background-color: rgba(0, 0, 0, 0.3) !important;
-    }
-    
-    /* スマートフォン版ヘッダーレイアウト修正 */
+    /* ヘッダー */
     .mobile-only.header-gradient {
         display: flex !important;
         flex-direction: row !important;
@@ -509,8 +301,6 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
         justify-content: center !important;
         padding: 2vw !important;
         margin: 2vw !important;
-        margin-top: 2vw !important;
-        margin-bottom: 2vw !important;
         gap: 4vw !important;
     }
     
@@ -535,33 +325,42 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
         flex-shrink: 1 !important;
     }
     
-    /* スマートフォン版のみ表示 */
-    .mobile-only {
-        display: block;
-    }
-
-    .tab {
-        font-size: 5vw !important; 
-        padding: 3vw 2vw !important; 
-        border-top-left-radius: 2vw; /* 左上の角を丸くする */
-        border-top-right-radius: 2vw; /* 右上の角を丸くする */
+    /* フッター */
+    .mobile-only.bg-footer {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 1000 !important;
+        width: 100% !important;
+        background-color: rgba(0, 0, 0, 0.3) !important;
     }
     
-    /* スマホ版では個人順位を非表示 */
-    .player-pos {
-        display: none !important;
+    /* タブ */
+    .tab {
+        font-size: 5vw !important;
+        padding: 3vw 2vw !important;
+        border-top-left-radius: 2vw;
+        border-top-right-radius: 2vw;
     }
-
-    /* スマホ版射撃競技特有要素 */
+    
+    /* 競技要素 */
     .section-title { font-size: 6vw !important; margin-bottom: 4vw !important; }
     .team-rank { font-size: 7vw !important; line-height: 7vw !important; }
     .team-name { font-size: 6vw !important; line-height: 7vw !important; }
     .team-total { font-size: 7vw !important; }
     .player-name { font-size: 5vw !important; }
     .player-score { font-size: 5vw !important; }
-    .tab { font-size: 5vw !important; padding: 3vw 2vw !important; }
+    .player-pos { display: none !important; }
     
-    /* 種目バッジ画像 */
+    /* チームアイコン */
+    .team-icon-style {
+        height: 8vw;
+        width: 8vw;
+        margin-right: 2vw;
+    }
+    
+    /* 種目バッジ */
     .event-badge-img {
         height: 4.8vw;
         margin-right: 2vw;
@@ -573,7 +372,6 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
     
     .event-badge-trap { border: 0.375vw solid #c855e3; }
     .event-badge-skeet { border: 0.375vw solid #eebf35; }
-    .event-badge-overall { border: 0.375vw solid #22c55e; }
     .event-badge-team { border: 0.375vw solid #22c55e; }
     
     .team-score-badge {
@@ -588,63 +386,53 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
     .team-score-badge.trap { border: 0.375vw solid #c855e3; }
     .team-score-badge.skeet { border: 0.375vw solid #eebf35; }
     
-    .font-bold.mb-2.text-sm {
-        margin-top: 2vw !important;
-        font-size: 5.2vw !important;
+    /* 総合成績の配点表示 */
+    #team-overall .team-total-breakdown {
+        display: none !important;
     }
     
-    h1 { font-size: 6vw !important; }
-
-    /* スマホ版: 新しい合計点表示のスタイル */
+    #team-overall .team-total-overall {
+        font-size: 7vw !important;
+        margin-left: 0 !important;
+    }
+    
     .team-total-container {
         font-weight: 700;
     }
-    .team-total-breakdown {
-        font-size: 4vw; /* 内訳のフォントサイズ */
-    }
-    .total-separator {
-        color: rgba(255,255,255,0.8);
-        margin: 0 1vw;
-    }
-    .team-total-overall {
-        font-size: 7vw; /* 総合計のフォントサイズ */
-        margin-left: 1vw;
-    }
+    
     .accordion-chevron {
-        font-size: 4vw; /* 矢印のサイズ調整 */
+        font-size: 4vw;
         margin-left: 2vw;
     }
-} /* === スマホ版メディアクエリ終了 === */
+}
 
-/* === レスポンシブ：PC版（viewport単位） === */
-/* ★★★ PC版視認性改善 - 2025/01/22更新 ★★★ */
+/* ========================================
+   15. PC版（デスクトップ・Google TV）
+======================================== */
 @media (min-width: 1024px) {
     body {
         height: 100vh;
         overflow: hidden;
     }
     
-    /* ★ テキストサイズ - 約1.5倍に拡大 */
-    .text-xs { font-size: 1.8vh; line-height: 2.4vh; }  /* 1.2vh → 1.8vh */
-    .text-sm { font-size: 2.1vh; line-height: 1.35; }   /* 1.4vh → 2.1vh */
-    .text-lg { font-size: 2.7vh; line-height: 4.2vh; }  /* 1.8vh → 2.7vh */
-    .text-xl { font-size: 3.0vh; line-height: 4.2vh; }  /* 2vh → 3.0vh */
-    .text-2xl { font-size: 3.6vh; line-height: 4.8vh; } /* 2.4vh → 3.6vh */
-    .text-4xl { font-size: 5.4vh; line-height: 6vh; }   /* 3.6vh → 5.4vh */
+    /* テキストサイズ（拡大版） */
+    .text-xs { font-size: 1.8vh; line-height: 2.4vh; }
+    .text-sm { font-size: 2.1vh; line-height: 1.35; }
+    .text-lg { font-size: 2.7vh; line-height: 4.2vh; }
+    .text-xl { font-size: 3.0vh; line-height: 4.2vh; }
+    .text-2xl { font-size: 3.6vh; line-height: 4.8vh; }
+    .text-4xl { font-size: 5.4vh; line-height: 6vh; }
     
-    /* マージン・パディング（現状維持） */
+    /* パディング・マージン */
     .p-0-5 { padding: 0.2vh; }
     .p-1 { padding: 0.4vh; }
     .p-2 { padding: 0.8vh; }
     .p-4 { padding: 1.6vh; }
-    
     .px-1 { padding-left: 0.4vh; padding-right: 0.4vh; }
     .px-6 { padding-left: 2.4vh; padding-right: 2.4vh; }
-    
     .py-0-5 { padding-top: 0.2vh; padding-bottom: 0.1vh; }
     .py-1 { padding-top: 0.4vh; padding-bottom: 0.4vh; }
     .py-2 { padding-top: 0.8vh; padding-bottom: 0.8vh; }
-    
     .pl-0 { padding-left: 0; }
     .pr-0 { padding-right: 0; }
     .pr-4 { padding-right: 1.6vh; }
@@ -657,9 +445,6 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
     .mx-auto { margin-left: auto; margin-right: auto; }
     .mr-0 { margin-right: 0; }
     
-    /* Gap（間隔）- 現状維持 */
-    .gap-1rem { gap: 1.6vh; }
-    
     /* 幅・高さ */
     .w-8 { width: 3.2vh; }
     .w-12 { width: 4.8vh; }
@@ -667,7 +452,8 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
     .h-12 { height: 4.8vh; }
     .min-w-300 { min-width: 32vh; }
     
-    /* スペーシング - 現状維持 */
+    /* スペーシング */
+    .gap-1rem { gap: 1.6vh; }
     .space-x-2 > * + * { margin-left: 0.8vh; }
     .space-x-4 > * + * { margin-left: 1.6vh; }
     .space-y-1 > * + * { margin-top: 0.3vh; }
@@ -677,131 +463,266 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
     .border-b { border-bottom-width: 0.1vh; }
     .border-b-2 { border-bottom-width: 0.2vh; }
     .rounded-lg { border-radius: 0.8vh; }
-    .shadow-lg { box-shadow: 0 1vh 1.5vh -0.3vh rgba(0, 0, 0, 0.1), 0 0.4vh 0.6vh -0.2vh rgba(0, 0, 0, 0.05); }
+    .shadow-lg { 
+        box-shadow: 0 1vh 1.5vh -0.3vh rgba(0, 0, 0, 0.1), 
+                    0 0.4vh 0.6vh -0.2vh rgba(0, 0, 0, 0.05); 
+    }
     
-    /* 分割線 */
     .divide-y > * + * {
         border-top-width: 0.1vh;
         border-color: rgba(255, 255, 255, 0.2);
     }
     
-    /* 3カラムグリッド */
-    .lg-grid { display: grid; }
+    /* ★ 全画面レイアウト（Google TV対応） */
+    .fullscreen-container {
+        height: 100vh;
+        padding: 0.8vh;
+        padding-bottom: 0;
+        margin: 0;
+        max-width: 100%;
+    }
+    
+    main {
+        height: 100%;
+        padding-bottom: 0 !important;
+    }
+    
+    .pb-2 { padding-bottom: 0.8vh; }
+    .lg-pb-0 { padding-bottom: 0; }
+    
+    /* グリッドレイアウト */
+    .lg-grid { 
+        display: grid;
+        height: 100%;
+    }
     .lg-grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .lg-grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .lg-gap-2 { gap: 0.8vh; }  /* 現状維持 */
+    .lg-gap-2 { gap: 0.8vh; }
     .lg-gap-4 { gap: 1.6vh; }
     
     .lg-h-full { height: 100%; }
     .lg-overflow-y-auto { overflow-y: auto; }
     .lg-block { display: block !important; }
+    .lg-flex { display: flex !important; }
+    .lg-hidden { display: none !important; }
     
-    /* ★ テキストサイズクラス - 拡大 */
-    .lg-text-lg { font-size: 2.7vh !important; line-height: 4.2vh !important; }  /* 1.8vh → 2.7vh */
-    .lg-text-base { font-size: 2.4vh !important; line-height: 3.6vh !important; }  /* 1.6vh → 2.4vh */
-    .lg-text-xs { font-size: 1.8vh !important; }  /* 1.2vh → 1.8vh */
+    /* PC版テキストサイズ */
+    .lg-text-lg { font-size: 2.7vh !important; line-height: 4.2vh !important; }
+    .lg-text-base { font-size: 2.4vh !important; line-height: 3.6vh !important; }
+    .lg-text-xs { font-size: 1.8vh !important; }
     .lg-leading-tight { line-height: 1.25 !important; }
+    .lg-text-center { text-align: center !important; }
     
     .lg-py-1 { padding-top: 0.4vh !important; padding-bottom: 0.4vh !important; }
     .lg-py-0 { padding-top: 0 !important; padding-bottom: 0 !important; }
     .lg-mb-1 { margin-bottom: 0.4vh !important; }
     .lg-font-black { font-weight: 900 !important; }
-    .lg-text-center { text-align: center !important; }
     
-    .lg-pb-0 { padding-bottom: 0; }
-    .pb-2 { padding-bottom: 0.8vh; }
-    
-    /* モバイル専用要素を非表示 */
+    /* モバイル要素非表示 */
     .mobile-only { display: none !important; }
-    
-    /* PC版では全タブコンテンツを表示 */
     .tab-content { display: block !important; }
     
-    /* ★ 全画面活用 - Viewport対策（95vhに調整） */
-    .fullscreen-container {
-        height: calc(100vh - 2vh);  /* 下部2vh分の安全マージン */
-        padding: 0.8vh;
-        padding-bottom: 2vh;  /* 下部余白を確保 */
-        margin: 0;
-        max-width: 100%;
+    /* ★ カラムレイアウト（Google TV対応） */
+    #team-trap,
+    #team-skeet,
+    #team-overall {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
     }
     
-    /* PC版でアコーディオンを常時開く */
-    .accordion-content {
-        max-height: none !important;
-        overflow: visible !important;
-        display: block !important;
+    /* セクションタイトル */
+    .section-title {
+        flex-shrink: 0;
+        font-size: 3.6vh !important;
+        margin-top: 0;
+        margin-bottom: 0.4vh !important;
+        height: 4vh;
     }
     
-    .accordion-chevron {
-        transform: rotate(180deg);
-        display: none !important;
+    /* ★ カードコンテナ（Google TV対応） */
+    #team-trap-event,
+    #team-skeet-event,
+    #team-overall-results {
+        flex: 1;
+        height: calc(100% - 4.4vh);
+        overflow-y: auto;
+        overflow-x: hidden;
+        display: flex;
+        flex-direction: column;
+        gap: 0.1vh;
     }
     
-    /* ★ PC版射撃競技特有要素 - 大幅拡大 */
-    .team-header { font-size: 3.0vh !important; }  /* 2vh → 3.0vh */
-    .team-rank { font-size: 3.6vh !important; }    /* 2.4vh → 3.6vh */
-    .team-name { font-size: 3.0vh !important; }    /* 2vh → 3.0vh */
-    .team-total { font-size: 4.2vh !important; }   /* 2.8vh → 4.2vh */
+    /* ★ 種目別カード高さ（Google TV対応） */
+    #team-trap-event > .bg-card,
+    #team-skeet-event > .bg-card {
+        flex: 1 1 0;
+        min-height: 0;
+        max-height: calc((100vh - 10vh) / 6);
+        overflow: hidden;
+        margin-bottom: 0;
+        display: flex;
+        flex-direction: column;
+        padding-bottom: 0;
+    }
+    
+    /* ★ 総合成績カード高さ（種目別と統一） */
+    #team-overall-results > .bg-card {
+        flex: 1 1 0;
+        min-height: 0;
+        max-height: calc((100vh - 10vh) / 6);
+        overflow: hidden;
+        margin-bottom: 0;
+        display: flex;
+        flex-direction: column;
+        padding-bottom: 0;
+    }
+    
+    /* 種目別チームヘッダー */
+    #team-trap-event .bg-card > div:first-child,
+    #team-skeet-event .bg-card > div:first-child {
+        padding-top: 0.4vh !important;
+        padding-bottom: 0.4vh !important;
+    }
+    
+    /* 総合成績チームヘッダー */
+    #team-overall .bg-card > button {
+        padding-top: 0.4vh !important;
+        padding-bottom: 0.4vh !important;
+    }
+    
+    /* 種目別テーブルパディング */
+    #team-trap-event .px-6,
+    #team-skeet-event .px-6 {
+        padding-left: 2.4vh !important;
+        padding-right: 2.4vh !important;
+        padding-top: 0 !important;
+        padding-bottom: 0.2vh !important;
+    }
+    
+    /* 種目別選手行 */
+    #team-trap-event td,
+    #team-skeet-event td {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        line-height: 1.1 !important;
+    }
+    
+    /* 競技要素サイズ */
+    .team-header { font-size: 3.0vh !important; }
+    .team-rank { font-size: 3.6vh !important; }
+    .team-name { font-size: 3.0vh !important; }
+    .team-total { font-size: 4.2vh !important; }
     .player-name { 
-        font-size: 2.6vh !important;  /* 2vh → 2.6vh */
-        padding-right: 0.8vh !important; 
+        font-size: 2.6vh !important;
+        padding-right: 0.8vh !important;
     }
     .player-score { 
-        font-size: 2.6vh !important;  /* 2vh → 2.6vh */
+        font-size: 2.6vh !important;
         padding-left: 0.2vh !important;
         padding-right: 0.2vh !important;
     }
-
-    .section-title { 
-        font-size: 3.6vh !important;  /* 2.4vh → 3.6vh */
-        margin-top: 0; 
-        margin-bottom: 0.8vh !important; 
+    
+    /* 個人順位表示 */
+    .player-pos {
+        display: inline !important;
+        color: rgba(255, 255, 255, 0.7) !important;
+        font-size: 1.8vh !important;
     }
     
-    /* PC版でのテーブル列幅の強制設定 */
-    .player-score:last-child {
-        width: 12% !important;
-        max-width: 12% !important;
-        min-width: 12% !important;
+    #team-overall .player-pos {
+        display: none !important;
     }
     
-    /* 合計列のテキストオーバーフロー防止 */
-    .player-score[style*="color: #c855e3"],
-    .player-score[style*="color: #eebf35"],
-    .player-score[style*="color: #22c55e"] {
-        overflow: hidden !important;
-        text-overflow: clip !important;
-        white-space: nowrap !important;
-        padding-right: 0.2vh !important;
+    /* テーブルレイアウト */
+    .overflow-x-auto {
+        overflow-x: auto;
+        overflow-y: visible;
+        max-height: none;
+        margin-left: auto;
+        margin-right: auto;
     }
     
-    /* テーブルカラム幅をviewport単位で制御 */
-    colgroup col:nth-child(1) { width: 5.6vh !important; }   /* 順位: 7% */
-    colgroup col:nth-child(2) { width: 32vh !important; }    /* 選手名: 40% */
+    /* テーブル列幅 */
+    colgroup col:nth-child(1) { width: 5.6vh !important; }
+    colgroup col:nth-child(2) { width: 32vh !important; }
     colgroup col:nth-child(3),
     colgroup col:nth-child(4),
     colgroup col:nth-child(5),
-    colgroup col:nth-child(6) { width: 6.4vh !important; }   /* R1-R4: 各8% */
-    colgroup col:nth-child(7) { width: 10.4vh !important; }  /* 合計: 13% */
+    colgroup col:nth-child(6) { width: 6.4vh !important; }
+    colgroup col:nth-child(7) { width: 10.4vh !important; }
     
-    table[style*="table-layout: fixed"] {
-        table-layout: fixed !important;
+    /* 総合成績テーブル列幅 */
+    #team-overall table colgroup col:nth-child(1) { width: 13% !important; }
+    #team-overall table colgroup col:nth-child(2) { width: 40% !important; }
+    #team-overall table colgroup col:nth-child(3),
+    #team-overall table colgroup col:nth-child(4),
+    #team-overall table colgroup col:nth-child(5),
+    #team-overall table colgroup col:nth-child(6) { width: 8% !important; }
+    #team-overall table colgroup col:nth-child(7) { width: 15% !important; }
+    
+    /* ★ 総合成績アコーディオン（下部パディング追加） */
+    #team-overall .accordion-content {
+        max-height: none !important;
+        overflow: visible !important;
+        display: block !important;
+        padding-top: 0.4vh !important;
+        padding-bottom: 2vh !important;  /* 下部余白確保 */
     }
     
-    table[style*="table-layout: fixed"] td:last-child {
-        width: 12% !important;
-        max-width: 12% !important;
-        min-width: 12% !important;
-        box-sizing: border-box !important;
+    #team-overall .accordion-content .lg-grid {
+        gap: 0.8vh !important;
     }
     
-    /* ★ PC版での種目アイコンサイズ調整 - 拡大 */
-    .section-title .event-badge-img { height: 2.88vh !important; }  /* 1.92vh → 2.88vh */
+    #team-overall .accordion-content .px-6 {
+        padding-left: 1.6vh !important;
+        padding-right: 1.6vh !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        min-width: 100%;
+    }
     
-    /* ★ 種目バッジ画像 - 拡大 */
+    .accordion-chevron {
+        display: none !important;
+    }
+    
+    /* 総合成績ヘッダー非表示 */
+    #team-overall .accordion-content h4 {
+        display: none !important;
+    }
+    
+    /* 総合成績テーブル調整 */
+    #team-overall .accordion-content td {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        line-height: 1.1 !important;
+        vertical-align: middle !important;
+    }
+    
+    #team-overall .accordion-content .lg-text-xs {
+        font-size: 1.6vh !important;
+    }
+    
+    #team-overall .accordion-content tr {
+        line-height: 1.2 !important;
+    }
+    
+    /* 総合成績バッジ非表示 */
+    #team-overall .team-score-badge {
+        display: none;
+    }
+    
+    /* チームアイコン */
+    .team-icon-style {
+        height: 4.2vh;
+        width: 4.2vh;
+        margin-right: 0.8vh;
+    }
+    
+    /* 種目バッジ */
     .event-badge-img {
-        height: 2.88vh;  /* 1.92vh → 2.88vh */
+        height: 2.88vh;
         margin-right: 0.8vh;
         vertical-align: middle;
         border-radius: 0.4vh;
@@ -811,199 +732,12 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
     
     .event-badge-trap { border: 0.15vh solid #c855e3; }
     .event-badge-skeet { border: 0.15vh solid #eebf35; }
-    .event-badge-overall { border: 0.15vh solid #22c55e; }
     .event-badge-team { border: 0.15vh solid #22c55e; }
     
-    .team-score-badge {
-        height: 2.64vh !important;  /* 1.76vh → 2.64vh */
-        margin-right: 0.4vh !important;
-        vertical-align: middle;
-        border-radius: 0.4vh;
-        padding: 0.2vh !important;
-        transform: translateY(-0.16vh);
-    }
-    
-    .team-score-badge.trap { border: 0.15vh solid #c855e3; }
-    .team-score-badge.skeet { border: 0.15vh solid #eebf35; }
-    
-    /* PC版でのパディング調整 */
-    .px-6 {
-        padding-left: 9.6vh !important;
-        padding-right: 9.6vh !important;
-    }
-    
-    /* PC版での総合成績ボタンのパディング調整 */
-    #team-overall .px-6 {
-        padding-left: 2.4vh !important;
-        padding-right: 2.4vh !important;
-    }
-    
-    /* PC版での総合成績テーブルのパディング調整 */
-    #team-overall .accordion-content .px-6 {
-        padding-left: 1.6vh !important;
-        padding-right: 1.6vh !important;
-    }
-
-    /* PC版: 総合成績の2カラムレイアウト内のテーブル幅を再定義 */
-    #team-overall table colgroup col:nth-child(1) { width: 13% !important; }
-    #team-overall table colgroup col:nth-child(2) { width: 40% !important; }
-    #team-overall table colgroup col:nth-child(3),
-    #team-overall table colgroup col:nth-child(4),
-    #team-overall table colgroup col:nth-child(5),
-    #team-overall table colgroup col:nth-child(6) { width: 8% !important; }
-    #team-overall table colgroup col:nth-child(7) { width: 15% !important; }
-
-    /* === 総合成績セクション内の選手テーブル専用スタイル (PC) === */
-
-    /* ★ 「トラップ:」「スキート:」ヘッダーのフォントと下余白を調整 - 拡大 */
-    #team-overall .accordion-content h4 {
-        font-size: 2.25vh !important;  /* 1.5vh → 2.25vh */
-        margin-bottom: 0.4vh !important;
-    }
-
-    /* 選手テーブルのセルの上下余白を適度に確保 */
-    #team-overall .accordion-content td {
-        padding-top: 0.2vh !important;  /* 0.05vh → 0.2vh 余白を増やす */
-        padding-bottom: 0.2vh !important;  /* 0.05vh → 0.2vh 余白を増やす */
-        line-height: 1.2 !important;  /* 0.9 → 1.2 行高さを調整 */
-        vertical-align: middle !important;
-    }
-
-    /* ★ 選手テーブルのフォントサイズを調整 - 折り返し防止のため縮小 */
-    #team-overall .accordion-content .lg-text-xs {
-        font-size: 1.6vh !important;  /* 1.95vh → 1.6vh 折り返し防止 */
-    }
-    
-    /* 総合成績の選手テーブルの行間を広げる */
-    #team-overall .accordion-content tr {
-        line-height: 1.4 !important;  /* 行間を広げて見やすく */
-    }
-    
-    /* 総合成績のヘッダーと選手リストの間に余白を追加 */
-    #team-overall .accordion-content {
-        padding-top: 1.2vh !important;  /* ヘッダーとの間隔を確保 */
-    }
-
-    /* PC版: 総合成績チーム名ヘッダーを種目別と統一 */
-    #team-overall .bg-card > button {
-        padding-top: 0 !important;
-        padding-bottom: 0 !important;
-        min-height: unset !important; /* 最小高さを削除して種目別と同じに */
-    }
-    
-    /* 総合成績の行高さを種目別と統一 */
-    #team-overall .team-rank,
-    #team-overall .team-name {
-        line-height: 1 !important; /* 行高さを最小化 */
-    }
-    /* PC版: 総合成績セクション、ヘッダー下の見出し(h4)が持つ不要な上マージンを削除 */
-    #team-overall .accordion-content h4 { margin-top: 0 !important; }
-    /* PC版: 総合成績セクションの種目バッジを非表示 */
-    #team-overall .team-score-badge {
-        display: none;
-    }
-    /* PC版でスマホ用の合計点を非表示にする */
-    .lg-hidden {
-        display: none !important;
-    }
-
-    /* PC版: 総合成績の小計ヘッダーは不要なため非表示に */
-    #team-overall .accordion-content h4 {
-        display: none !important;
-    }
-    /* PC版で要素をflex表示にするユーティリティ */
-    .lg-flex {
-        display: flex !important;
-    }
-    /* ★ PC版: 新しい合計点表示のスタイル - 最適化 */
-    .team-total-container {
-        font-weight: 700;
-        align-items: center;  /* 垂直中央揃え */
-        flex-wrap: nowrap;    /* 折り返し禁止 */
-    }
-    .team-total-breakdown {
-        font-size: 2.2vh;  /* 3.0vh → 2.2vh 控えめに縮小 */
-        white-space: nowrap;  /* 折り返し防止 */
-    }
-    .total-separator {
-        color: rgba(255,255,255,0.8);
-        margin: 0 0.5vh;
-    }
-    .team-total-overall {
-        font-size: 4.2vh;  /* 3.9vh → 3.5vh 少し縮小 */
-        margin-left: 0.8vh;
-    }
-    /* PC版：3カラムのカードの高さを統一するスタイル */
-    #team-trap, #team-skeet, #team-overall {
-        display: flex !important;
-        flex-direction: column !important;
-        height: 100%; /* 高さを明示的に100%に */
-    }
-
-    #team-trap-event, #team-skeet-event, #team-overall-results {
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 0.3vh; /* カード間の統一された間隔 */
-    }
-
-    /* すべてのカードを同じ高さに揃える */
-    #team-trap-event > .bg-card,
-    #team-skeet-event > .bg-card,
-    #team-overall-results > .bg-card {
-        flex: 1; /* flex-growからflexに変更して均等配分 */
-        display: flex;
-        flex-direction: column;
-        min-height: 0; /* flexboxの縮小を許可 */
-    }
-    /* PC版: 入れ子にしたdivが原因のレイアウト崩れを防止 */
-    .accordion-content .px-6 {
-        min-width: 100%;
-    }
-    /* PC版: トラップ・スキート種目の合計点を右揃えにする */
-    #team-trap-event .team-total,
-    #team-skeet-event .team-total {
-        margin-left: auto; /* 合計点を右に寄せる */
-    }
-
-    /* PC版: トラップ・スキート種目の選手別合計点を右揃えにする */
-    #team-trap-event td:last-child,
-    #team-skeet-event td:last-child {
-        text-align: right !important;
-    }
-    /*
-      PC版: テーブルコンテナにvw単位で幅を指定し、中央に配置する
-      - これにより、テーブルは常に安定した幅を基準に列幅を計算でき、間延びを防ぐ
-    */
-    #team-trap-event .overflow-x-auto,
-    #team-skeet-event .overflow-x-auto {
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    /* PC版: 合計点の右揃えと、文字切れ防止のパディングを維持 */
-    #team-trap-event td:last-child,
-    #team-skeet-event td:last-child {
-        text-align: right !important;
-        padding-right: 0.0vw !important;
-    }
-
-    /* ★ PC版では個人順位を表示 - 拡大 */
-    .player-pos {
-        display: inline !important;
-        color: rgba(255, 255, 255, 0.7) !important;
-        font-size: 1.8vh !important;  /* 1.2vh → 1.8vh */
-    }
-    
-    /* ★ 総合成績セクションでは個人順位を非表示（折り返し防止） */
-    #team-overall .player-pos {
-        display: none !important;
-    }
-
-    /* ★ 状況アイコン - 拡大 */
+    /* 状況アイコン */
     .status-icon {
         display: inline-block;
-        font-size: 3.0vh;  /* 2.0vh → 3.0vh */
+        font-size: 3.0vh;
         vertical-align: middle;
         transform: translateY(-0.3vh);
         line-height: 1;
@@ -1014,97 +748,52 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
         vertical-align: middle;
         line-height: inherit;
     }
-
-} /* === PC版メディアクエリ終了 ===*/
-
-
-/* === チームアイコンのスタイル === */
-.team-icon-style {
-  border-radius: 50%; /* 円形にする */
-  object-fit: cover;    /* 画像のアスペクト比を維持しつつ、要素にフィットさせる */
-  vertical-align: middle; /* テキストと垂直方向中央に揃える */
+    
+    /* 総合成績配点表示 */
+    .team-total-container {
+        font-weight: 700;
+        align-items: center;
+        flex-wrap: nowrap;
+        padding-right: 0.5vh;
+    }
+    
+    .team-total-breakdown {
+        font-size: 2.2vh;
+        white-space: nowrap;
+        display: inline-flex !important;
+        align-items: center;
+    }
+    
+    .total-separator {
+        color: rgba(255,255,255,0.8);
+        margin: 0 0.5vh;
+    }
+    
+    .team-total-overall {
+        font-size: 4.2vh;
+        margin-left: 0.8vh;
+    }
 }
 
-/* === レスポンシブ：スマホ版 === */
-@media (max-width: 1023px) {
-  .team-icon-style {
-    height: 8vw; /* チーム名のフォントサイズ(6vw)に合わせて調整 */
-    width: 8vw;
-    margin-right: 2vw; /* 右側の余白 */
-  }
+/* ========================================
+   16. アニメーション定義
+======================================== */
+
+/* 選手更新点滅 */
+@keyframes blinkBrightness {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
 }
 
-/* === レスポンシブ：PC版 === */
+.updnew td {
+    animation: blinkBrightness 1.5s infinite !important;
+    position: relative;
+    z-index: 20;
+}
+
+/* PC版ランクアップアニメーション */
 @media (min-width: 1024px) {
-  /* ★ チームアイコン - 拡大 */
-  .team-icon-style {
-    height: 4.2vh;  /* 2.8vh → 4.2vh */
-    width: 4.2vh;   /* 2.8vh → 4.2vh */
-    margin-right: 0.8vh;
-  }
-}
-/* カードヘッダーのフォントファミリーを Arial に統一 */
-.team-rank,
-.team-name, 
-.team-total, 
-.team-total-container {
-    font-family: 'Arial', sans-serif !important;
-}
-
-/* 順位上昇時の強調アニメーション（PC版のみ） */
-@media (min-width: 1024px) {
-    /* ランクアップ時に他のカードを暗くする */
-    .rank-changing #team-trap-event .bg-card:not(.rank-improved),
-    .rank-changing #team-skeet-event .bg-card:not(.rank-improved),
-    .rank-changing #team-overall-results .bg-card:not(.rank-improved) {
-        position: relative;
-        transition: all 0.5s ease-out;
-    }
-    
-    .rank-changing #team-trap-event .bg-card:not(.rank-improved)::after,
-    .rank-changing #team-skeet-event .bg-card:not(.rank-improved)::after,
-    .rank-changing #team-overall-results .bg-card:not(.rank-improved)::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0, 0, 0, 0.5);  /* 0.2 → 0.5 に変更（より暗く） */
-        pointer-events: none;
-        border-radius: inherit;
-        z-index: 1;
-        opacity: 0;
-        animation: fadeInDark 0.5s ease-out forwards;
-    }
-    
-    /* 暗転のフェードインアニメーション */
-    @keyframes fadeInDark {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
-    }
-    
-    /* rank-changingクラスが外れる時のフェードアウト */
-    #team-trap-event .bg-card:not(.rank-improved)::after,
-    #team-skeet-event .bg-card:not(.rank-improved)::after,
-    #team-overall-results .bg-card:not(.rank-improved)::after {
-        animation: fadeOutDark 0.8s ease-out;
-    }
-    
-    @keyframes fadeOutDark {
-        from {
-            opacity: 1;
-        }
-        to {
-            opacity: 0;
-        }
-    }
-
-    /* 暗転用クラス */
+    /* 暗転クラス */
     .darken-card {
         position: relative;
     }
@@ -1116,7 +805,7 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
         left: 0;
         right: 0;
         bottom: 0;
-        background-color: rgba(0, 0, 0, 0.6); /* より暗く */
+        background-color: rgba(0, 0, 0, 0.6);
         pointer-events: none;
         border-radius: inherit;
         z-index: 1;
@@ -1124,37 +813,27 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
         animation: fadeInDark 0.5s ease-out forwards;
     }
     
-    /* 明るく戻る時のクラス */
     .lighten-card::after {
         animation: fadeOutDark 0.8s ease-out forwards !important;
     }
     
     @keyframes fadeInDark {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
+        from { opacity: 0; }
+        to { opacity: 1; }
     }
     
     @keyframes fadeOutDark {
-        from {
-            opacity: 1;
-        }
-        to {
-            opacity: 0;
-        }
+        from { opacity: 1; }
+        to { opacity: 0; }
     }
-
-    /* ランクアップしたチーム */
+    
+    /* ランクアップカード */
     .rank-improved {
         position: relative;
-        animation: rainbowPulse 10s ease-out;  /* 5s → 10s に変更 */
+        animation: rainbowPulse 10s ease-out;
         z-index: 10;
     }
     
-    /* SVG上矢印のオーバーレイ */
     .rank-improved::before {
         content: '';
         position: absolute;
@@ -1168,162 +847,99 @@ tbody tr *:not([style*="color:"]):not(.hl23):not(.hl24):not(.hl25) {
         background-position: center;
         background-size: contain;
         pointer-events: none;
-        animation: arrowPulse 10s ease-out;  /* 5s → 10s に変更 */
+        animation: arrowPulse 10s ease-out;
     }
     
     @keyframes rainbowPulse {
-          0% {
-              box-shadow: 
-                  0 0 20px 5px rgba(255, 0, 0, 0.8),
-                  0 0 40px 10px rgba(255, 0, 0, 0.5),
-                  0 0 60px 15px rgba(255, 0, 0, 0.3);
-              transform: scale(1);
-          }
-          10% {  /* 20% → 10% */
-              box-shadow: 
-                  0 0 20px 5px rgba(255, 255, 0, 0.8),
-                  0 0 40px 10px rgba(255, 255, 0, 0.5),
-                  0 0 60px 15px rgba(255, 255, 0, 0.3);
-              transform: scale(1.02);
-          }
-          20% {  /* 40% → 20% */
-              box-shadow: 
-                  0 0 20px 5px rgba(0, 255, 0, 0.8),
-                  0 0 40px 10px rgba(0, 255, 0, 0.5),
-                  0 0 60px 15px rgba(0, 255, 0, 0.3);
-              transform: scale(1.05);
-          }
-          30% {  /* 60% → 30% */
-              box-shadow: 
-                  0 0 20px 5px rgba(0, 0, 255, 0.8),
-                  0 0 40px 10px rgba(0, 0, 255, 0.5),
-                  0 0 60px 15px rgba(0, 0, 255, 0.3);
-              transform: scale(1.02);
-          }
-          40% {  /* 新規追加 - 紫色フェーズ */
-              box-shadow: 
-                  0 0 20px 5px rgba(128, 0, 255, 0.8),
-                  0 0 40px 10px rgba(128, 0, 255, 0.5),
-                  0 0 60px 15px rgba(128, 0, 255, 0.3);
-              transform: scale(1.03);
-          }
-          60% {  /* 維持フェーズ */
-              box-shadow: 
-                  0 0 20px 5px rgba(0, 128, 255, 0.6),
-                  0 0 40px 10px rgba(0, 128, 255, 0.4),
-                  0 0 60px 15px rgba(0, 128, 255, 0.2);
-              transform: scale(1.01);
-          }
-          80% {
-              box-shadow: 
-                  0 0 20px 5px rgba(0, 0, 255, 0.4),
-                  0 0 40px 10px rgba(0, 0, 255, 0.25),
-                  0 0 60px 15px rgba(0, 0, 255, 0.15);
-              transform: scale(1.01);
-          }
-          100% {
-              box-shadow: 
-                  0 0 20px 5px rgba(0, 0, 255, 0),
-                  0 0 40px 10px rgba(0, 0, 255, 0),
-                  0 0 60px 15px rgba(0, 0, 255, 0);
-              transform: scale(1);
-          }
-      }
+        0% {
+            box-shadow: 
+                0 0 20px 5px rgba(255, 0, 0, 0.8),
+                0 0 40px 10px rgba(255, 0, 0, 0.5),
+                0 0 60px 15px rgba(255, 0, 0, 0.3);
+            transform: scale(1);
+        }
+        10% {
+            box-shadow: 
+                0 0 20px 5px rgba(255, 255, 0, 0.8),
+                0 0 40px 10px rgba(255, 255, 0, 0.5),
+                0 0 60px 15px rgba(255, 255, 0, 0.3);
+            transform: scale(1.02);
+        }
+        20% {
+            box-shadow: 
+                0 0 20px 5px rgba(0, 255, 0, 0.8),
+                0 0 40px 10px rgba(0, 255, 0, 0.5),
+                0 0 60px 15px rgba(0, 255, 0, 0.3);
+            transform: scale(1.05);
+        }
+        30% {
+            box-shadow: 
+                0 0 20px 5px rgba(0, 0, 255, 0.8),
+                0 0 40px 10px rgba(0, 0, 255, 0.5),
+                0 0 60px 15px rgba(0, 0, 255, 0.3);
+            transform: scale(1.02);
+        }
+        40% {
+            box-shadow: 
+                0 0 20px 5px rgba(128, 0, 255, 0.8),
+                0 0 40px 10px rgba(128, 0, 255, 0.5),
+                0 0 60px 15px rgba(128, 0, 255, 0.3);
+            transform: scale(1.03);
+        }
+        60% {
+            box-shadow: 
+                0 0 20px 5px rgba(0, 128, 255, 0.6),
+                0 0 40px 10px rgba(0, 128, 255, 0.4),
+                0 0 60px 15px rgba(0, 128, 255, 0.2);
+            transform: scale(1.01);
+        }
+        80% {
+            box-shadow: 
+                0 0 20px 5px rgba(0, 0, 255, 0.4),
+                0 0 40px 10px rgba(0, 0, 255, 0.25),
+                0 0 60px 15px rgba(0, 0, 255, 0.15);
+            transform: scale(1.01);
+        }
+        100% {
+            box-shadow: 
+                0 0 20px 5px rgba(0, 0, 255, 0),
+                0 0 40px 10px rgba(0, 0, 255, 0),
+                0 0 60px 15px rgba(0, 0, 255, 0);
+            transform: scale(1);
+        }
+    }
     
-      /* 矢印のアニメーション - より長い表示時間 */
-      @keyframes arrowPulse {
-          0%, 10% {
-              opacity: 0;
-              transform: translate(-50%, -30%) scale(0.5);
-          }
-          20% {
-              opacity: 1;
-              transform: translate(-50%, -50%) scale(1.2);
-          }
-          30%, 50% {  /* 表示時間を延長 */
-              opacity: 1;
-              transform: translate(-50%, -50%) scale(1);
-          }
-          70% {
-              opacity: 0.8;
-              transform: translate(-50%, -55%) scale(0.95);
-          }
-          100% {
-              opacity: 0;
-              transform: translate(-50%, -70%) scale(0.8);
-          }
-      }
-}
-
-/* 選手更新時の点滅アニメーション - シンプルな明度変化のみ */
-@keyframes blinkBrightness {
-    0%, 100% {
-        opacity: 0.3;
+    @keyframes arrowPulse {
+        0%, 10% {
+            opacity: 0;
+            transform: translate(-50%, -30%) scale(0.5);
+        }
+        20% {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+        30%, 50% {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        70% {
+            opacity: 0.8;
+            transform: translate(-50%, -55%) scale(0.95);
+        }
+        100% {
+            opacity: 0;
+            transform: translate(-50%, -70%) scale(0.8);
+        }
     }
-    50% {
-        opacity: 1;
+    
+    /* 暗転中でも点滅行は明るく */
+    .darken-card tr.updnew {
+        position: relative;
+        z-index: 2;
     }
-}
-
-/* 点滅する行のスタイル */
-.updnew td {
-    animation: blinkBrightness 1.5s infinite !important;
-    position: relative;
-    z-index: 20; /* 暗転したカードより前面に表示 */
-}
-
-/* 点滅中の行を暗転から除外 */
-.darken-card tr.updnew {
-    position: relative;
-    z-index: 2; /* 暗転オーバーレイより前面 */
-}
-
-/* PC版のみ：暗転中でも点滅行は明るく表示 */
-@media (min-width: 1024px) {
+    
     .darken-card tr.updnew td {
         position: relative;
         animation: blinkBrightness 1.5s infinite !important;
-    }
-}
-
-/* === スマホ版で種目別配点を非表示 === */
-@media (max-width: 1023px) {
-    /* 総合成績の種目別配点詳細を非表示 */
-    #team-overall .team-total-breakdown {
-        display: none !important;
-    }
-    
-    /* 総合配点のみ表示 */
-    #team-overall .team-total-overall {
-        font-size: 7vw !important;
-        margin-left: 0 !important;
-    }
-}
-
-/* === PC版では種目別配点を表示 === */
-@media (min-width: 1024px) {
-    /* PC版は既存のスタイルを維持 */
-    #team-overall .team-total-breakdown {
-        display: inline-flex !important;
-        align-items: center;
-    }
-}
-
-
-
-@media (min-width: 1024px) {
-    /* 既存のスタイル... */
-    
-    /* 総合成績のボタンの上下パディングを種目別と完全一致させる */
-    #team-overall .bg-card > button {
-        padding-top: 0.8vh !important;  /* py-2と同じ値 */
-        padding-bottom: 0.8vh !important;  /* py-2と同じ値 */
-    }
-    
-    /* 種目別のヘッダー部分の上下パディングを明示的に指定 */
-    #team-trap-event .bg-card > div:first-child,
-    #team-skeet-event .bg-card > div:first-child {
-        padding-top: 0.8vh !important;
-        padding-bottom: 0.8vh !important;
     }
 }
